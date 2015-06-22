@@ -9,5 +9,6 @@ urlpatterns = [
     url(r'^Pause/$', Pause, name='Pause'),
     url(r'^SetTime/(?P<timeStamp>[0-9]+)/$', SetTime, name='SetTime'),
     url(r'^GetTime/$', GetTime, name='GetTime'),
-    url(r'^GetInsertQuery/(?P<userName>[0-9a-zA-Z]*)/(?P<message>[?!^ +$]^.+)/$', GetInsertQuery, name='GetInsertQuery')
+    url(r'^PostInsertQuery/', PostInsertQuery, name='PostInsertQuery'),
+    url(r'^GetInsertQuery/', GetInsertQuery, name='GetInsertQuery')
 ]

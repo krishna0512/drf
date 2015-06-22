@@ -1,6 +1,9 @@
 from django.shortcuts import render
 from django.http import HttpResponse
 from polls.models import Post, Comment
+from django.utils import timezone
+import requests
+
 
 isPlay = False
 videoTime = 0
@@ -29,11 +32,19 @@ def SetTime (request, timeStamp):
 
 def GetTime (request):   
     global videoTime
-    return HttpResponse(videoTime)
+    x = request.GET.has_key('krishna')
+    if x:
+        return HttpResponse(str( request.GET['krishna']))
+    else:
+        return HttpResponse("no")
 
-def GetInsertQuery(request,userName,message):
-    q = Post(message = str(message), fromUser = int(userName), timestamp = timezone.now())
+def PostInsertQuery (request):
+    q = Post(message = str(request.GET['message']), fromUser = int(request.GET['name']), timestamp = timezone.now())
     q.save()
-    return HttpResponse(str(q.message + ' ' + q.fromUser + ' ' + q.timestamp))
-    #return HttpResponse(str(userName+Message))
-# Create your views here.
+    return HttpResponse(str(q.fromUser) + ' ' + str(q.timestamp) + '\n' + q.message)
+
+def GetInsertQuery (request):
+    s = ''
+    for i in Post.objects.all():
+        s += str(i.fromUser) + '\n' + str(i.message) + '\n\n'
+    return HttpResponse(str(s))
