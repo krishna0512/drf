@@ -4,11 +4,11 @@ from django.db import models
 class Post (models.Model):
 	message = models.CharField (max_length=20000)
 	timestamp = models.DateTimeField ('Time Published')
-	fromUser = models.IntegerField (default=0)
+	fromUser = models.CharField (max_length=200)
 
 
 class Comment (models.Model):
 	post = models.ForeignKey (Post)
 	message = models.CharField (max_length=20000)
 	timestamp = models.DateTimeField ('Time Published')
-	fromUser = models.IntegerField (default=0)
+	fromUser = models.CharField (max_length=200)

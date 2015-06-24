@@ -4,7 +4,7 @@ import requests
 from StringIO import StringIO
 from PyQt4 import QtGui, QtCore, uic
 
-form_class = uic.loadUiType("temp2.ui")[0]
+form_class = uic.loadUiType("chat.ui")[0]
 
 class Chat(QtGui.QMainWindow,form_class):
     """A simple Media Player using VLC and Qt
@@ -21,7 +21,7 @@ class Chat(QtGui.QMainWindow,form_class):
     	self.textArea.setText('')
 
     def submit(self):
-        payload={'name':12,'message':str(self.textArea.toPlainText())}
+        payload={'name':'krishna','message':str(self.textArea.toPlainText())}
         url = 'http://localhost:8000/polls/PostInsertQuery/'
         r=requests.get(url,params=payload)
         # updates the messages retrived from the server
