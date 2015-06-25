@@ -44,17 +44,16 @@ def GetTime (request):
 def PostInsertQuery (request):
     # retrieving the data form the GET dictionary
     message = str(request.GET['message'])
-    name = int(request.GET['name'])
+    name = str(request.GET['name'])
     # creating a new Post to save the data in database
     q = Post(message = message, fromUser = name, timestamp = timezone.now())
     q.save()
-    retstring = str(q.fromUser) + ' ' + str(q.timestamp) + '\n' + q.message
-    return HttpResponse(retstring)
+    return HttpResponse(name)
 
 def GetInsertQuery (request):
     s = ''
     for i in Post.objects.all():
-        s += str(i.fromUser) + '\n' + str(i.message) + '\n\n'
+        s += str(i.fromUser) + ':\n' + str(i.message) + '\n'
     return HttpResponse(str(s))
 
 def Register (request):
@@ -84,30 +83,14 @@ def Login (request):
 
 def GetUserDetail (request):
     u = request.user
-    if request.user.is_authenticated():
-        return HttpResponse(str(u.username) + '\n' + str(u.email) + '\n' + str(u.first_name) + '\n' + str(u.last_name))
+    if request.user.is_authenticated() == True:
+        return HttpResponse(str(u.username) + '\n' + str(u.email) + '\n' + str(u.first_name) + ' ' + str(u.last_name))
     else:
-        return HttpResponse('')
+        return HttpResponse('no user logged in!')
 
 def Logout (request):
     if request.user.is_authenticated():
         logout(request)
     return HttpResponse('')
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 

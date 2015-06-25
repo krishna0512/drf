@@ -85,6 +85,7 @@ class Login(QtGui.QMainWindow,form_class):
         self.registerButton.clicked.connect(self.openRegisteration)
         self.loginButton.clicked.connect(self.login)
         self.cancelButton.clicked.connect(self.closeWindow)
+        self.sessionid = ''
 
     def login(self):
         usernameValue =str(self.username.toPlainText()).strip()
@@ -92,16 +93,19 @@ class Login(QtGui.QMainWindow,form_class):
         payload={'username':str(usernameValue), 'pass':str(passwordValue)}
         url = 'http://localhost:8000/polls/Login/'
         r=requests.get(url,params=payload)
+        self.sessionid = r.cookies['sessionid']
         if r.text == '':
             self.dlg = Dialog()
             self.dlg.setMessage("username or password incorrect")
             self.dlg.show()
         else:
             # Login Successfull
-            #self.dlg = Dialog()
-            # self.dlg.setMessage(r.text + " successfully logged in")
+#           self.dlg = Dialog()
+#           self.dlg.setMessage(r.text + " successfully logged in")
 #           self.dlg.show()
-            self.chat = Chat()
+            # self is passed in the chat to gain the access to
+            # self.sessionid variable..
+            self.chat = Chat(self)
             self.chat.show()
             self.hide()
 
@@ -121,7 +125,6 @@ class Login(QtGui.QMainWindow,form_class):
             event.accept()
         else:
             event.ignore()       
-
 
 
 
