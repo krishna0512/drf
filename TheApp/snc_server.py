@@ -2,10 +2,85 @@ import sys
 import os.path
 import vlc
 import pycurl
+import requests
 from StringIO import StringIO
 from PyQt4 import QtGui, QtCore, uic
 
-form_class = uic.loadUiType("temp.ui")[0]
+form_class = uic.loadUiType("serverUi.ui")[0]
+
+class PostQues(QtGui.QWidget):
+        
+    def __init__(self,master=None):
+        QtGui.QWidget.__init__(self, master)
+        self.setWindowTitle('QtGui.QCheckBox')
+        self.i=0
+        self.option = []
+        self.question = []
+        self.optionEdit = []
+        self.questionEdit = []
+
+        
+        self.question.append(QtGui.QLabel('Question'))
+        self.option.append(QtGui.QLabel('Option'+ str(self.i + 1)))
+        
+        self.questionEdit.append(QtGui.QLineEdit())
+        self.optionEdit.append(QtGui.QLineEdit())
+
+        self.addOptButton = QtGui.QPushButton('',self)
+        self.addOptButton.setIcon(QtGui.QIcon('add.png'))
+        self.addOptButton.clicked.connect(self.addOption)
+        
+        self.submitButton = QtGui.QPushButton('Submit',self)
+        self.submitButton.clicked.connect(self.submit)
+        
+        self.grid = QtGui.QGridLayout()
+        self.grid.setSpacing(10)
+        
+        self.grid.addWidget(self.question[self.i], 1, 0)
+        self.grid.addWidget(self.questionEdit[self.i], 1, 1,1,3)
+
+        self.grid.addWidget(self.option[self.i], 2, 0)
+        self.grid.addWidget(self.optionEdit[self.i], 2, 1,1,2)
+
+        self.grid.addWidget(self.addOptButton, 2,3)
+        self.grid.addWidget(self.submitButton, 3,2,1,2)
+        self.i+=1
+
+        
+        self.setLayout(self.grid) 
+        
+#       self.setGeometry(300, 300, 350, 300)
+        self.setWindowTitle('Review')   
+
+    def addOption(self):
+        self.option.append(QtGui.QLabel('Option'+ str(self.i + 1)))
+        self.optionEdit.append(QtGui.QLineEdit())
+        self.grid.addWidget(self.option[self.i], 2+self.i, 0)
+        self.grid.addWidget(self.optionEdit[self.i],2+self.i,1,1,2)
+        self.grid.addWidget(self.addOptButton, 2+self.i,3)
+        self.grid.addWidget(self.submitButton, 3+self.i,2,1,2)
+        self.i+=1
+
+    def submit(self):
+        options=[]
+        question = str(self.questionEdit[0].text()).strip()
+        for j in xrange(self.i):
+            options.append(str(self.optionEdit[j].text()).strip())       
+        url = 'http://localhost:8000/polls/PostQues/'
+        payload = {'options':options,'ques':question}
+        r=requests.get(url,params=payload)
+    
+    def closeEvent(self, event):
+        reply = QtGui.QMessageBox.question(self, 'Message',
+            "Are you sure to quit?", QtGui.QMessageBox.Yes | 
+            QtGui.QMessageBox.No, QtGui.QMessageBox.No)
+
+        if reply == QtGui.QMessageBox.Yes:
+            event.accept()
+        else:
+            event.ignore() 
+        
+
 
 class Player(QtGui.QMainWindow,form_class):
     """A simple Media Player using VLC and Qt
@@ -28,6 +103,7 @@ class Player(QtGui.QMainWindow,form_class):
         self.timeslider.sliderMoved.connect(self.setPosition)
         self.playbutton.clicked.connect(self.playPause)
         self.stopbutton.clicked.connect(self.stop)
+        self.postbutton.clicked.connect(self.postQues)
         self.menuOpen.triggered.connect(self.openFile)
         self.playbutton.setIcon(QtGui.QIcon('playButton.png'))
         self.playbutton.setIconSize(QtCore.QSize(24,24))
@@ -35,8 +111,7 @@ class Player(QtGui.QMainWindow,form_class):
         self.stopbutton.setIconSize(QtCore.QSize(24,24))
         self.volumeslider.setValue(self.mediaplayer.audio_get_volume())
         self.volumeslider.valueChanged.connect(self.setVolume)
-        #self.menubar.menuOpen.triggered.connect(self.openFile)
-        #self.menubar.menuExit.triggered.connect(sys.exit)
+        self.menuExit.triggered.connect(sys.exit)
 
         if self.mediaplayer.play() == -1:
             self.playbutton.setText("Open")
@@ -44,17 +119,17 @@ class Player(QtGui.QMainWindow,form_class):
     def setPosition (self, position):
         self.mediaplayer.set_position(position/1000.0)
 
+    def postQues (self, position):
+        self.popup = PostQues()
+        self.popup.show()
 
     def openFile(self, filename=None):
         """Open a media file in a MediaPlayer
         """
         if filename == False:
             filename = None
-        print 'reached open'
-        print filename
         if filename is None:
             filename = QtGui.QFileDialog.getOpenFileName(self, "Open File", os.path.expanduser('~'))
-        print filename
         if not filename:
             return
 
@@ -160,14 +235,9 @@ class Player(QtGui.QMainWindow,form_class):
                 fullTime = str(minute if minute>=10 else '0' + str(minute))+':'+str(sec if sec>=10 else '0' + str(sec))
         self.fulltime.setText(fullTime)
 
-        c = pycurl.Curl()
-        url = 'http://localhost:8000/polls/SetTime/' + str(int(self.mediaplayer.get_position()*10000)) + '/'
-        print 'q'
-        #url = 'http://localhost:8000/polls/SetTime/' +str(12) + '/'
-        print 'w'
-        c.setopt(c.URL, url)
-        c.perform()
-        c.close()
+        url = 'http://localhost:8000/polls/SetTime/'
+        payload= {'currentPosition':int(self.mediaplayer.get_position()*10000)}
+        r=requests.get(url,params=payload)
         if not self.mediaplayer.is_playing():
             # no need to call this function if nothing is played
             self.timer.stop()

@@ -1,6 +1,6 @@
 from django.shortcuts import render
 from django.http import HttpResponse
-from polls.models import Post, Comment
+from polls.models import *
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate, login, logout
 from django.utils import timezone
@@ -10,6 +10,7 @@ import json
 
 isPlay = False
 videoTime = 0
+haveQues = False
 
 def index (request):
     return HttpResponse("you reached index")
@@ -24,22 +25,38 @@ def Pause (request):
     isPlay = False
     return HttpResponse(isPlay)
 
-def isPlaying (request):
-    global isPlay
-    return HttpResponse(isPlay)
-
-def SetTime (request, timeStamp):   
+def SetTime (request):   
     global videoTime
-    videoTime = timeStamp
+    videoTime = request.GET['currentPosition']
     return HttpResponse(videoTime)
 
-def GetTime (request):   
-    global videoTime
-    x = request.GET.has_key('krishna')
-    if x:
-        return HttpResponse(str( request.GET['krishna']))
+def PostQues (request):   
+    global haveQues
+    question = str( request.GET['ques'] )
+    options = request.GET.getlist('options')
+    
+    q = Question(question_text = question, pub_date = timezone.now())
+    q.save()
+    for option in options:
+        q.choice_set.create(choice_text = str(option)) 
+
+    haveQues = True
+    return HttpResponse(haveQues)
+
+def GetCurSet (request):
+    global videoTime, isPlay, haveQues
+    options = []
+    if haveQues == False:
+        data = {'curTime':videoTime,'isPlaying':isPlay, 'haveQues':haveQues}
     else:
-        return HttpResponse("no")
+        q = Question.objects.order_by('-id')[0]
+        ques_text = str(q.question_text)
+        for option in q.choice_set.all():
+            options.append(str(option.choice_text))
+        data = {'curTime':videoTime,'isPlaying':isPlay, 'haveQues':haveQues, 'question':ques_text, 'options':options}
+        haveQues = False
+    data2 = json.dumps(data)
+    return HttpResponse(data2)
 
 def PostInsertQuery (request):
     # retrieving the data form the GET dictionary
@@ -76,9 +93,19 @@ def Login (request):
     user = authenticate (username=username, password=password)
     if user is not None:
         login (request, user)
-        return HttpResponse(username)
+ #      return HttpResponse(username)
+
+ #      response = HttpResponse()
+ #      response['uname']=username
+ #      return response
+
+        data = {'uname':username}
+        data2 = json.dumps(data)
+        return HttpResponse(data2)
     else:
         return HttpResponse('')
+ #      response = HttpResponse('')
+ #      return response
 
 
 def GetUserDetail (request):

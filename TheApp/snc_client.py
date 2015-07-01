@@ -1,11 +1,49 @@
 import sys
 import vlc
 import pycurl
+import requests
+import json
 from StringIO import StringIO
 from PyQt4 import QtGui, QtCore, uic
 
-form_class = uic.loadUiType("temp.ui")[0]
-previousStatus=''
+form_class = uic.loadUiType("clientUi.ui")[0]
+
+
+class PopupQues(QtGui.QWidget):
+        
+    def __init__(self,master=None):
+        QtGui.QWidget.__init__(self, master)
+        lbl1 = QtGui.QLabel(master.question, self)
+        lbl1.move(15, 10)
+        cb=[]
+        for i in xrange(len(master.options)):
+            cb.append(QtGui.QCheckBox(master.options[i], self))
+            cb[i].move(20, 20+20*i)
+            cb[i].toggle()
+            cb[i].stateChanged.connect(self.changeTitle)
+        self.setGeometry(300, 300, 250, 150)
+        self.setWindowTitle('QtGui.QCheckBox')
+        #self.ishow()
+    
+    def closeEvent(self, event):
+        reply = QtGui.QMessageBox.question(self, 'Message',
+            "Are you sure to quit?", QtGui.QMessageBox.Yes | 
+            QtGui.QMessageBox.No, QtGui.QMessageBox.No)
+
+        if reply == QtGui.QMessageBox.Yes:
+            master.isPlaying = master.data['isPlaying']
+            event.accept()
+        else:
+            event.ignore() 
+        
+    def changeTitle(self, state):
+        if state == QtCore.Qt.Checked:
+            self.setWindowTitle('QtGui.QCheckBox')
+        else:
+            self.setWindowTitle('')
+
+
+
 
 class Player(QtGui.QMainWindow,form_class):
     """A simple Media Player using VLC and Qt
@@ -28,6 +66,14 @@ class Player(QtGui.QMainWindow,form_class):
         self.timer.timeout.connect(self.updateUI)
         self.volumeslider.setValue(self.mediaplayer.audio_get_volume())
         self.volumeslider.valueChanged.connect(self.setVolume)
+
+        #global variables
+        self.data = {}
+        self.isPlaying = False
+        self.curPosition = 0
+        self.previousStatus = ''
+        self.haveQues = False
+        self.QuesSet = []
 
         if self.mediaplayer.play() == -1:
             self.playbutton.setText("Open")
@@ -86,16 +132,9 @@ class Player(QtGui.QMainWindow,form_class):
     def playPause(self):
         """Toggle play/pause status (can only be used for client side.)
         """
-        buffer = StringIO()
-        global previousStatus
-        c = pycurl.Curl()
-        c.setopt(c.URL,'http://localhost:8000/polls/isPlaying/')
-        c.setopt(c.WRITEDATA,buffer)
-        c.perform()
-        c.close()
-        status = str(buffer.getvalue())
+        status = str(self.isPlaying)
 
-        if status != previousStatus:
+        if status != self.previousStatus:
             if (status == 'True'):
                 if self.mediaplayer.play() == -1:
                     self.openFile()
@@ -107,24 +146,22 @@ class Player(QtGui.QMainWindow,form_class):
                 self.mediaplayer.pause()
                 self.playbutton.setText("Play")
                 self.isPaused = True
-        previousStatus = status
+        self.previousStatus = status
+
+    def popupExit(self):
+        print 'exit'
 
     def updatePosition (self):
         curPos=self.mediaplayer.get_position()*1000
         buffer = StringIO()
-        c = pycurl.Curl()
-        c.setopt(c.URL,'http://localhost:8000/polls/GetTime/')
-        c.setopt(c.WRITEDATA,buffer)
-        c.perform()
-        c.close()
         #getting the position of the server video
-        a = float(buffer.getvalue())
+        a = float(self.curPosition)
         if (a != ''):
             #a = int(a)
             a=a
         else:
             a=0
-        print str(curPos)+' '+str(a/10)
+        #print str(curPos)+' '+str(a/10)
         if abs(curPos-a/10)>=4.5:
             self.setPosition(a/10)
         #self.mediaplayer.set_time(length*self.mediaplayer.get_position())
@@ -132,6 +169,21 @@ class Player(QtGui.QMainWindow,form_class):
     def updateUI(self):
         """updates the user interface"""
         # setting the slider to the desired position
+        url = 'http://localhost:8000/polls/GetCurSet/'
+        r=requests.get(url)
+        self.data = json.loads(r.text)
+        self.isPlaying = self.data['isPlaying']
+        self.curPosition = self.data['curTime']
+        self.haveQues = self.data['haveQues']
+
+        if self.haveQues:
+            # self.isPlaying = False
+            self.question = self.data['question']
+            self.options = self.data['options']
+            self.popup = PopupQues(self)
+            self.popup.show()
+
+
         self.updatePosition()
         self.timeslider.setValue(self.mediaplayer.get_position() * 1000)
         #displaying the current time of the video

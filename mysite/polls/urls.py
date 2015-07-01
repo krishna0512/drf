@@ -4,11 +4,11 @@ from views import *
 
 urlpatterns = [
     url(r'^$', index, name='index'),
-    url(r'^isPlaying/$', isPlaying, name='isPlaying'),
     url(r'^Play/$', Play, name='Play'),
     url(r'^Pause/$', Pause, name='Pause'),
-    url(r'^SetTime/(?P<timeStamp>[0-9]+)/$', SetTime, name='SetTime'),
-    url(r'^GetTime/$', GetTime, name='GetTime'),
+    url(r'^SetTime/', SetTime, name='SetTime'),
+    url(r'^GetCurSet/', GetCurSet, name='GetCurSet'),
+    url(r'^PostQues/', PostQues, name='PostQues'),
     url(r'^PostInsertQuery/', PostInsertQuery, name='PostInsertQuery'),
     url(r'^GetInsertQuery/', GetInsertQuery, name='GetInsertQuery'),
     url(r'^Register/', Register, name='Register'),
