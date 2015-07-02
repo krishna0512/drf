@@ -18,6 +18,7 @@ class PostQues(QtGui.QWidget):
         self.question = []
         self.optionEdit = []
         self.questionEdit = []
+        self.currectOption = []
 
         
         self.question.append(QtGui.QLabel('Question'))
@@ -32,17 +33,20 @@ class PostQues(QtGui.QWidget):
         
         self.submitButton = QtGui.QPushButton('Submit',self)
         self.submitButton.clicked.connect(self.submit)
+            
+        self.currectOption.append(QtGui.QCheckBox('',self))
         
         self.grid = QtGui.QGridLayout()
         self.grid.setSpacing(10)
         
         self.grid.addWidget(self.question[self.i], 1, 0)
-        self.grid.addWidget(self.questionEdit[self.i], 1, 1,1,3)
+        self.grid.addWidget(self.questionEdit[self.i], 1, 1,1,6)
 
         self.grid.addWidget(self.option[self.i], 2, 0)
-        self.grid.addWidget(self.optionEdit[self.i], 2, 1,1,2)
-
-        self.grid.addWidget(self.addOptButton, 2,3)
+        self.grid.addWidget(self.optionEdit[self.i], 2, 1,1,4)
+        self.grid.addWidget(self.currectOption[self.i], 2, 5)
+        self.grid.addWidget(self.addOptButton, 2,6)
+        
         self.grid.addWidget(self.submitButton, 3,2,1,2)
         self.i+=1
 
@@ -55,19 +59,26 @@ class PostQues(QtGui.QWidget):
     def addOption(self):
         self.option.append(QtGui.QLabel('Option'+ str(self.i + 1)))
         self.optionEdit.append(QtGui.QLineEdit())
+        self.currectOption.append(QtGui.QCheckBox('',self))
         self.grid.addWidget(self.option[self.i], 2+self.i, 0)
-        self.grid.addWidget(self.optionEdit[self.i],2+self.i,1,1,2)
-        self.grid.addWidget(self.addOptButton, 2+self.i,3)
-        self.grid.addWidget(self.submitButton, 3+self.i,2,1,2)
+        self.grid.addWidget(self.optionEdit[self.i],2+self.i,1,1,4)
+        self.grid.addWidget(self.currectOption[self.i], 2+self.i, 5)
+        self.grid.addWidget(self.addOptButton, 2 + self.i, 6)
+        self.grid.addWidget(self.submitButton, 3 + self.i, 2, 1, 2)
         self.i+=1
 
     def submit(self):
         options=[]
+        currectAns = []
         question = str(self.questionEdit[0].text()).strip()
         for j in xrange(self.i):
-            options.append(str(self.optionEdit[j].text()).strip())       
+            options.append(str(self.optionEdit[j].text()).strip())    
+            if self.currectOption[j].isChecked():
+                currectAns.append(True)
+            else:
+                currectAns.append(False)
         url = 'http://localhost:8000/polls/PostQues/'
-        payload = {'options':options,'ques':question}
+        payload = {'options':options, 'ques':question, 'currectAnswer':currectAns}
         r=requests.get(url,params=payload)
     
     def closeEvent(self, event):

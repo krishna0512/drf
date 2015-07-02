@@ -34,14 +34,27 @@ def PostQues (request):
     global haveQues
     question = str( request.GET['ques'] )
     options = request.GET.getlist('options')
-    
+    curAns = request.GET.getlist('currectAnswer')
     q = Question(question_text = question, pub_date = timezone.now())
     q.save()
+    i=0
     for option in options:
-        q.choice_set.create(choice_text = str(option)) 
-
+        if curAns[i] == 'True':
+            q.choice_set.create(choice_text = str(option), isCurrect=True)
+        else:
+            q.choice_set.create(choice_text = str(option), isCurrect=False)
+        i+=1
     haveQues = True
     return HttpResponse(haveQues)
+
+def SubAns (request):
+    options = []
+    submitedAns = request.GET.getlist('options')
+    q = Question.objects.order_by('-id')[0]
+    for option in q.choice_set.all():
+        options.append(option.isCurrect)
+
+
 
 def GetCurSet (request):
     global videoTime, isPlay, haveQues

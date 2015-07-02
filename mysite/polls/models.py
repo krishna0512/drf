@@ -21,5 +21,6 @@ class Question(models.Model):
 class Choice(models.Model):
     question = models.ForeignKey(Question)
     choice_text = models.CharField(max_length=20000)
+    isCurrect = models.BooleanField(default = False)
     #votes = models.IntegerField(default=0)
 

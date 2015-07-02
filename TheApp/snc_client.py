@@ -9,22 +9,44 @@ from PyQt4 import QtGui, QtCore, uic
 form_class = uic.loadUiType("clientUi.ui")[0]
 
 
-class PopupQues(QtGui.QWidget):
+class PopupQues(QtGui.QMainWindow):
         
     def __init__(self,master=None):
-        QtGui.QWidget.__init__(self, master)
-        lbl1 = QtGui.QLabel(master.question, self)
-        lbl1.move(15, 10)
-        cb=[]
+        QtGui.QMainWindow.__init__(self, master)
+        lbl = QtGui.QLabel(master.question, self)
+        self.cb=[]
+
+        self.grid = QtGui.QGridLayout()
+        self.grid.setSpacing(10)
+
+        self.grid.addWidget(lbl,1,0,1,6)
+
         for i in xrange(len(master.options)):
-            cb.append(QtGui.QCheckBox(master.options[i], self))
-            cb[i].move(20, 20+20*i)
-            cb[i].toggle()
-            cb[i].stateChanged.connect(self.changeTitle)
-        self.setGeometry(300, 300, 250, 150)
+            self.cb.append(QtGui.QCheckBox(master.options[i], self))
+            self.grid.addWidget(self.cb[i],2,1,1,6)
+        
+        submitButton = QtGui.QPushButton('Submit',self)
+        submitButton.clicked.connect(self.submit)
+        self.grid.addWidget(submitButton,4,5)    
+
+        self.setLayout(self.grid) 
         self.setWindowTitle('QtGui.QCheckBox')
         #self.ishow()
     
+    def submit(self):
+        submitedAns=[]
+        for i in xrange(len(self.cb)):
+            if self.cb[i].isChecked():
+                submitedAns.append(True)
+            else:
+                submitedAns.append(False)
+        
+        url = 'http://localhost:8000/polls/SubAns/'
+        payload = {'options':submitedAns}
+        r=requests.get(url,params=payload)
+        
+
+
     def closeEvent(self, event):
         reply = QtGui.QMessageBox.question(self, 'Message',
             "Are you sure to quit?", QtGui.QMessageBox.Yes | 
@@ -36,12 +58,6 @@ class PopupQues(QtGui.QWidget):
         else:
             event.ignore() 
         
-    def changeTitle(self, state):
-        if state == QtCore.Qt.Checked:
-            self.setWindowTitle('QtGui.QCheckBox')
-        else:
-            self.setWindowTitle('')
-
 
 
 

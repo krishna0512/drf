@@ -9,6 +9,7 @@ urlpatterns = [
     url(r'^SetTime/', SetTime, name='SetTime'),
     url(r'^GetCurSet/', GetCurSet, name='GetCurSet'),
     url(r'^PostQues/', PostQues, name='PostQues'),
+    url(r'^SubAns/', SubAns, name='SubAns'),
     url(r'^PostInsertQuery/', PostInsertQuery, name='PostInsertQuery'),
     url(r'^GetInsertQuery/', GetInsertQuery, name='GetInsertQuery'),
     url(r'^Register/', Register, name='Register'),
