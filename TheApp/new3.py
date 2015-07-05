@@ -9,7 +9,7 @@ from PyQt4 import QtGui, QtCore, uic
 class PopupQues(QtGui.QWidget):
         
     def __init__(self,master=None):
-        QtGui.QWidget.__init__(self, master)
+        QtGui.QMainWindow.__init__(self, master)
         lbl1 = QtGui.QLabel('master.question', self)
         #lbl1.move(15, 10)
         cb=[]
@@ -21,12 +21,12 @@ class PopupQues(QtGui.QWidget):
             #cb[i].move(20, 20+20*i)
             #cb[i].stateChanged.connect(self.changeTitle)
             self.grid.addWidget(cb[i],2+i,1,1,2)
-
-
+        submitButton = QtGui.QPushButton('Submit',self)
+        self.grid.addWidget(submitButton,10,5)    
 
         self.setLayout(self.grid)
         #self.setGeometry(300, 300, 250, 150)
-        self.setWindowTitle('QtGui.QCheckBox')
+        self.setWindowTitle('QtGuiQCheckBox')
         #self.ishow()
     
     def closeEvent(self, event):

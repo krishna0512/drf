@@ -9,30 +9,29 @@ from PyQt4 import QtGui, QtCore, uic
 form_class = uic.loadUiType("clientUi.ui")[0]
 
 
-class PopupQues(QtGui.QMainWindow):
-        
+class PopupQues(QtGui.QDialog):
+
     def __init__(self,master=None):
         QtGui.QMainWindow.__init__(self, master)
-        lbl = QtGui.QLabel(master.question, self)
+        self.lbl1 = QtGui.QLabel(str(master.question), self)
         self.cb=[]
 
         self.grid = QtGui.QGridLayout()
         self.grid.setSpacing(10)
 
-        self.grid.addWidget(lbl,1,0,1,6)
-
-        for i in xrange(len(master.options)):
-            self.cb.append(QtGui.QCheckBox(master.options[i], self))
-            self.grid.addWidget(self.cb[i],2,1,1,6)
+        self.grid.addWidget(self.lbl1,1,1,1,6)
         
-        submitButton = QtGui.QPushButton('Submit',self)
-        submitButton.clicked.connect(self.submit)
-        self.grid.addWidget(submitButton,4,5)    
+        for i in xrange(len(master.options)):
+            self.cb.append(QtGui.QCheckBox(str(master.options[i]), self))
+            self.grid.addWidget(self.cb[i],2+i,2,1,5)
+        
+        self.submitButton = QtGui.QPushButton('aa',self)
+        self.grid.addWidget(self.submitButton,3+i,3)    
+        self.submitButton.clicked.connect(self.submit)
 
         self.setLayout(self.grid) 
-        self.setWindowTitle('QtGui.QCheckBox')
-        #self.ishow()
-    
+        self.setWindowTitle('tu bheta ye ki nahiiiii ?!!')
+        
     def submit(self):
         submitedAns=[]
         for i in xrange(len(self.cb)):
@@ -40,24 +39,22 @@ class PopupQues(QtGui.QMainWindow):
                 submitedAns.append(True)
             else:
                 submitedAns.append(False)
-        
         url = 'http://localhost:8000/polls/SubAns/'
         payload = {'options':submitedAns}
         r=requests.get(url,params=payload)
-        
 
 
-    def closeEvent(self, event):
-        reply = QtGui.QMessageBox.question(self, 'Message',
-            "Are you sure to quit?", QtGui.QMessageBox.Yes | 
-            QtGui.QMessageBox.No, QtGui.QMessageBox.No)
+#   def closeEvent(self, event):
+#       reply = QtGui.QMessageBox.question(self, 'Message',
+#           "Are you sure to quit?", QtGui.QMessageBox.Yes | 
+#           QtGui.QMessageBox.No, QtGui.QMessageBox.No)
 
-        if reply == QtGui.QMessageBox.Yes:
-            master.isPlaying = master.data['isPlaying']
-            event.accept()
-        else:
-            event.ignore() 
-        
+#       if reply == QtGui.QMessageBox.Yes:
+#           #master.isPlaying = master.data['isPlaying']
+#           event.accept()
+#       else:
+#           event.ignore() 
+#       
 
 
 
