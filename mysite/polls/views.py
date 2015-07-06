@@ -76,7 +76,14 @@ def GetCurSet (request):
 def PostInsertQuery (request):
     # retrieving the data form the GET dictionary
     message = str(request.GET['message'])
-    name = str(request.GET['name'])
+    name    = str(request.GET['name'   ])
+    isQues  = str(request.GET['isQues' ])
+    isAns   = str(request.GET['isAns'  ])
+    if isQues:
+        q = Post(message = message, fromUser = name, timestamp = timezone.now(), isQues = True)
+    else if isAns:
+        tag = str(request.GET['tag'    ])
+        q = Post() 
     # creating a new Post to save the data in database
     q = Post(message = message, fromUser = name, timestamp = timezone.now())
     q.save()
