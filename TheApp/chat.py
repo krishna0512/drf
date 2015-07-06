@@ -1,6 +1,7 @@
 import sys
 import os.path
 import requests
+import json
 from StringIO import StringIO
 from PyQt4 import QtGui, QtCore, uic
 
@@ -37,21 +38,23 @@ class Chat(QtGui.QMainWindow,form_class):
 
     def submit(self):
         payload={'name':self.username, 'message':str(self.textArea.toPlainText()).strip()}
-        if self.isQues.isChecked:
-            payload['isQues'] = True
-            payload['isAns' ] = False
-        if self.isAns.isChecked:
-            payload['isQues'] = False
-            payload['isAns' ] = True
-            payload[ 'tag'  ] = str(self.tagArea.toPlainText()).strip()
-        else:
-            payload['isQues'] = False
-            payload['isAns' ] = False
-        url = 'http://localhost:8000/polls/PostInsertQuery/'
-        requests.get(url,params=payload)
-    	self.textArea.setText('')
-        # updates the messages retrived from the server
-        self.updateMessage()
+        if str(self.textArea.toPlainText()).strip()!='':
+            if self.isQues.isChecked():
+                payload['isQues'] = True
+                payload['isAns' ] = False
+            elif self.isAns.isChecked():
+                payload['isQues'] = False
+                payload['isAns' ] = True
+                payload[ 'tag'  ] = str(self.tagArea.toPlainText()).strip()
+            else:
+                payload['isQues'] = False
+                payload['isAns' ] = False
+            url = 'http://localhost:8000/polls/PostInsertQuery/'
+            data = {'data':json.dumps(payload)}
+            requests.get(url,params = data)
+            self.textArea.setText('')
+            # updates the messages retrived from the server
+            self.updateMessage()
    
     def updateMessage(self):
         # Get all the messages from the database

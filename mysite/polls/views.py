@@ -75,24 +75,39 @@ def GetCurSet (request):
 
 def PostInsertQuery (request):
     # retrieving the data form the GET dictionary
-    message = str(request.GET['message'])
-    name    = str(request.GET['name'   ])
-    isQues  = str(request.GET['isQues' ])
-    isAns   = str(request.GET['isAns'  ])
-    if isQues:
-        q = Post(message = message, fromUser = name, timestamp = timezone.now(), isQues = True)
-    else if isAns:
-        tag = str(request.GET['tag'    ])
-        q = Post() 
+    data = str(request.GET['data'])
+    data = json.loads(data)
+    message = str(data['message'])
+    name    = str(data['name'   ])
+    isQues  = str(data['isQues' ])
+    isAns   = str(data['isAns'  ])
     # creating a new Post to save the data in database
-    q = Post(message = message, fromUser = name, timestamp = timezone.now())
+    if isQues == 'True':
+        q = Post(message = message, fromUser = name, timestamp = timezone.now(), isQues = True)
+    elif isAns == 'True':
+        print data['tag']
+        tag = data['tag'    ]
+        print 'q'
+        print tag 
+        q = Post.objects.get(id=tag) 
+        q.comment_set.create(message = message, fromUser = name, timestamp = timezone.now())
+    else:
+        q = Post(message = message, fromUser = name, timestamp = timezone.now())
     q.save()
     return HttpResponse(name)
 
 def GetInsertQuery (request):
     s = ''
     for i in Post.objects.all():
-        s += str(i.fromUser) + ':\n' + str(i.message) + '\n'
+        if i.isQues == True:
+            s += 'Q' + str(i.id) + ' ' + str(i.fromUser) + ':\n' + str(i.message) + '\n'
+            for j in i.comment_set.all():
+                s += str(j.fromUser) + ':\n' + str(j.message) + '\n'
+        else:
+            s += str(i.fromUser) + ':\n' + str(i.message) + '\n'
+
+            
+
     return HttpResponse(str(s))
 
 def Register (request):
