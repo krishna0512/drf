@@ -46,9 +46,16 @@ class Register(QtGui.QDialog,form2_class):
         emailValue =str(self.email.toPlainText()).strip()
         fnameValue =str(self.fname.toPlainText()).strip()
         lnameValue =str(self.lname.toPlainText()).strip()
-        if usernameValue != '' and passwordValue != '' and  emailValue != '' and  fnameValue != '' and lnameValue != '':
-            payload={'username':str(usernameValue), 'pass':str(passwordValue),
-                'email':str(emailValue), 'lname':str(lnameValue), 'fname':str(fnameValue)}
+        isTA = self.checkBox.isChecked()
+        if all(a != '' for a in (usernameValue, passwordValue, emailValue, fnameValue, lnameValue)):
+            payload = {
+                    'username'  : str (usernameValue),
+                    'pass'      : str (passwordValue),
+                    'email'     : str (emailValue),
+                    'lname'     : str (lnameValue),
+                    'fname'     : str (fnameValue),
+                    'ista'      : str (isTA)
+                    }
             url = 'http://localhost:8000/polls/Register/'
             r=requests.get(url,params=payload)
             if int(r.status_code) == 500:
@@ -62,7 +69,7 @@ class Register(QtGui.QDialog,form2_class):
                 self.hide()
         else:
             self.dlg = Dialog()
-            self.dlg.setMessage('Feild Missing')
+            self.dlg.setMessage('Field Missing!')
             self.dlg.show()
 
     def closeEvent(self, event):

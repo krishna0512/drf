@@ -1,7 +1,7 @@
 from django.shortcuts import render
 from django.http import HttpResponse
 from polls.models import *
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User, Group
 from django.contrib.auth import authenticate, login, logout
 from django.utils import timezone
 import requests
@@ -117,10 +117,17 @@ def Register (request):
     email = str(request.GET['email'])
     fname = str(request.GET['fname'])
     lname = str(request.GET['lname'])
+    ista = str (request.GET['ista'])
     user = User.objects.create_user (username, email, password)
     user.last_name = lname
     user.first_name = fname
     user.save()
+    ta = Group.objects.get(name='TA')
+    student = Group.objects.get(name='Student')
+    if ista == 'True':
+        ta.user_set.add(user)
+    else:
+        student.user_set.add(user)
     return HttpResponse(username)
 
 

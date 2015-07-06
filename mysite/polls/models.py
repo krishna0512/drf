@@ -25,6 +25,6 @@ class Choice(models.Model):
     isCurrect       = models.BooleanField ('is Correct', default=False)
 
 class Session(models.Model):
-    startedBy       = models.ForeignKey (User, unique=True)
+    startedBy       = models.OneToOneField(User)
     isActive        = models.BooleanField (default=False)
     isCompleted     = models.BooleanField (default=False)
