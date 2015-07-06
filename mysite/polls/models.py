@@ -5,7 +5,7 @@ class Post (models.Model):
     message = models.CharField ('Message', max_length=20000)
     timestamp = models.DateTimeField ('Time Published')
     fromUser = models.CharField ('From User', max_length=200)
-    isQues = models.BooleanField('Is Question', default = False)
+    isQues = models.BooleanField('Is Question', default=False)
 
 class Comment (models.Model):
     post = models.ForeignKey (Post)
@@ -21,5 +21,5 @@ class Question(models.Model):
 class Choice(models.Model):
     question = models.ForeignKey(Question)
     choice_text = models.CharField('Choice Text', max_length=20000)
-    isCurrect = models.BooleanField('is Correct', default = False)
+    isCurrect = models.BooleanField('is Correct', default=False)
     #votes = models.IntegerField(default=0)
