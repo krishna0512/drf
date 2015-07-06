@@ -25,7 +25,7 @@ class PopupQues(QtGui.QDialog):
             self.cb.append(QtGui.QCheckBox(str(master.options[i]), self))
             self.grid.addWidget(self.cb[i],2+i,2,1,5)
         
-        self.submitButton = QtGui.QPushButton('aa',self)
+        self.submitButton = QtGui.QPushButton('Submit',self)
         self.grid.addWidget(self.submitButton,3+i,3)    
         self.submitButton.clicked.connect(self.submit)
 
@@ -42,7 +42,7 @@ class PopupQues(QtGui.QDialog):
         url = 'http://localhost:8000/polls/SubAns/'
         payload = {'options':submitedAns}
         r=requests.get(url,params=payload)
-
+        self.hide()
 
 #   def closeEvent(self, event):
 #       reply = QtGui.QMessageBox.question(self, 'Message',

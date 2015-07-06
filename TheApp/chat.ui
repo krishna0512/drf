@@ -18,9 +18,9 @@
     <property name="geometry">
      <rect>
       <x>0</x>
-      <y>310</y>
+      <y>270</y>
       <width>361</width>
-      <height>161</height>
+      <height>151</height>
      </rect>
     </property>
    </widget>
@@ -56,7 +56,43 @@
       <x>10</x>
       <y>0</y>
       <width>341</width>
-      <height>271</height>
+      <height>251</height>
+     </rect>
+    </property>
+   </widget>
+   <widget class="QRadioButton" name="isQues">
+    <property name="geometry">
+     <rect>
+      <x>0</x>
+      <y>440</y>
+      <width>116</width>
+      <height>22</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>As Question</string>
+    </property>
+   </widget>
+   <widget class="QRadioButton" name="isAns">
+    <property name="geometry">
+     <rect>
+      <x>120</x>
+      <y>440</y>
+      <width>116</width>
+      <height>22</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>As Answer</string>
+    </property>
+   </widget>
+   <widget class="QPlainTextEdit" name="tagArea">
+    <property name="geometry">
+     <rect>
+      <x>233</x>
+      <y>440</y>
+      <width>111</width>
+      <height>28</height>
      </rect>
     </property>
    </widget>

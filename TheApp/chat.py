@@ -36,7 +36,17 @@ class Chat(QtGui.QMainWindow,form_class):
     	self.textArea.setText('')
 
     def submit(self):
-        payload={'name':self.username,'message':str(self.textArea.toPlainText()).strip()}
+        payload={'name':self.username, 'message':str(self.textArea.toPlainText()).strip()}
+        if self.isQues.isChecked:
+            payload['isQues'] = True
+            payload['isAns' ] = False
+        if self.isAns.isChecked:
+            payload['isQues'] = False
+            payload['isAns' ] = True
+            payload[ 'tag'  ] = str(self.tagArea.toPlainText()).strip()
+        else:
+            payload['isQues'] = False
+            payload['isAns' ] = False
         url = 'http://localhost:8000/polls/PostInsertQuery/'
         requests.get(url,params=payload)
     	self.textArea.setText('')

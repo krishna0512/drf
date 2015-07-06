@@ -52,9 +52,11 @@ def SubAns (request):
     submitedAns = request.GET.getlist('options')
     q = Question.objects.order_by('-id')[0]
     for option in q.choice_set.all():
-        options.append(option.isCurrect)
-
-
+        options.append(str(option.isCurrect))
+    if options == submitedAns:
+        return HttpResponse(True)   #correct response
+    else:
+        return HttpResponse(False)  #incorrect response
 
 def GetCurSet (request):
     global videoTime, isPlay, haveQues

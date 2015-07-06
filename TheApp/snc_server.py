@@ -80,6 +80,7 @@ class PostQues(QtGui.QWidget):
         url = 'http://localhost:8000/polls/PostQues/'
         payload = {'options':options, 'ques':question, 'currectAnswer':currectAns}
         r=requests.get(url,params=payload)
+        self.hide()
     
     def closeEvent(self, event):
         reply = QtGui.QMessageBox.question(self, 'Message',

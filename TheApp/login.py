@@ -114,15 +114,15 @@ class Login(QtGui.QMainWindow,form_class):
             else:
                 # Login Successfull
                 self.sessionid = r.cookies['sessionid']
-                self.dlg = Dialog()
-                data = json.loads(r.text)
-                self.dlg.setMessage(data['uname'] + " successfully logged in")
-                self.dlg.show()
+#               self.dlg = Dialog()
+#               data = json.loads(r.text)
+#               self.dlg.setMessage(data['uname'] + " successfully logged in")
+#               self.dlg.show()
                # self is passed in the chat to gain the access to
                # self.sessionid variable..
-#              self.chat = Chat(self)
-#              self.chat.show()
-#              self.hide()
+                self.chat = Chat(self)
+                self.chat.show()
+                self.hide()
 
     def openRegisteration(self):
         self.reg = Register()
