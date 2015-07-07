@@ -100,7 +100,6 @@ class Login(QtGui.QMainWindow,form_class):
                     }
             url = 'http://localhost:8000/polls/Login/'
             r = requests.get(url,params=payload)
-            print r.text
             if r.text == '':
                 self.dlg = Dialog("username or password incorrect")
                 self.dlg.show()

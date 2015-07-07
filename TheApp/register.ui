@@ -25,6 +25,9 @@
    <property name="text">
     <string>Username</string>
    </property>
+   <property name="buddy">
+    <cstring>username</cstring>
+   </property>
   </widget>
   <widget class="QLabel" name="passwordLabel">
    <property name="geometry">
@@ -37,6 +40,9 @@
    </property>
    <property name="text">
     <string>Password</string>
+   </property>
+   <property name="buddy">
+    <cstring>password</cstring>
    </property>
   </widget>
   <widget class="QLabel" name="emailLabel">
@@ -51,6 +57,9 @@
    <property name="text">
     <string>Email Id</string>
    </property>
+   <property name="buddy">
+    <cstring>email</cstring>
+   </property>
   </widget>
   <widget class="QLabel" name="fnameLabel">
    <property name="geometry">
@@ -64,6 +73,9 @@
    <property name="text">
     <string>Fisrt Name</string>
    </property>
+   <property name="buddy">
+    <cstring>fname</cstring>
+   </property>
   </widget>
   <widget class="QLabel" name="lnameLabel">
    <property name="geometry">
@@ -76,6 +88,9 @@
    </property>
    <property name="text">
     <string>Last Name</string>
+   </property>
+   <property name="buddy">
+    <cstring>lname</cstring>
    </property>
   </widget>
   <widget class="QPlainTextEdit" name="username">
@@ -168,6 +183,16 @@
    </property>
   </widget>
  </widget>
+ <tabstops>
+  <tabstop>username</tabstop>
+  <tabstop>password</tabstop>
+  <tabstop>email</tabstop>
+  <tabstop>fname</tabstop>
+  <tabstop>lname</tabstop>
+  <tabstop>checkBox</tabstop>
+  <tabstop>okButton</tabstop>
+  <tabstop>cancelButton</tabstop>
+ </tabstops>
  <resources/>
  <connections/>
 </ui>

@@ -23,6 +23,9 @@
       <height>27</height>
      </rect>
     </property>
+    <property name="focusPolicy">
+     <enum>Qt::StrongFocus</enum>
+    </property>
     <property name="text">
      <string>Register</string>
     </property>
@@ -52,6 +55,9 @@
     <property name="text">
      <string>Username</string>
     </property>
+    <property name="buddy">
+     <cstring>username</cstring>
+    </property>
    </widget>
    <widget class="QLabel" name="passwordLabel">
     <property name="geometry">
@@ -64,6 +70,9 @@
     </property>
     <property name="text">
      <string>Password</string>
+    </property>
+    <property name="buddy">
+     <cstring>password</cstring>
     </property>
    </widget>
    <widget class="QTextEdit" name="password">
@@ -104,6 +113,9 @@
     <property name="text">
      <string>Login</string>
     </property>
+    <property name="default">
+     <bool>true</bool>
+    </property>
    </widget>
    <widget class="QPushButton" name="cancelButton">
     <property name="geometry">
@@ -131,6 +143,13 @@
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
  </widget>
+ <tabstops>
+  <tabstop>username</tabstop>
+  <tabstop>password</tabstop>
+  <tabstop>loginButton</tabstop>
+  <tabstop>cancelButton</tabstop>
+  <tabstop>registerButton</tabstop>
+ </tabstops>
  <resources/>
  <connections/>
 </ui>
