@@ -2,6 +2,7 @@ import sys
 import os.path
 import vlc
 import pycurl
+import json
 import requests
 from StringIO import StringIO
 from PyQt4 import QtGui, QtCore, uic
@@ -9,10 +10,13 @@ from PyQt4 import QtGui, QtCore, uic
 form_class = uic.loadUiType("serverUi.ui")[0]
 
 class PostQues(QtGui.QWidget):
-        
+    '''
+        A simple class for posting popup question to check presence
+    '''    
     def __init__(self,master=None):
         QtGui.QWidget.__init__(self, master)
         self.setWindowTitle('QtGui.QCheckBox')
+        
         self.i=0
         self.option = []
         self.question = []
@@ -79,6 +83,7 @@ class PostQues(QtGui.QWidget):
                 currectAns.append(False)
         url = 'http://localhost:8000/polls/PostQues/'
         payload = {'options':options, 'ques':question, 'currectAnswer':currectAns}
+#       master.popupExit(payload)
         r=requests.get(url,params=payload)
         self.hide()
     
@@ -95,7 +100,7 @@ class PostQues(QtGui.QWidget):
 
 
 class Player(QtGui.QMainWindow,form_class):
-    """A simple Media Player using VLC and Qt
+    """A simple Media Player using VLC and Qt for server side
     """
     def __init__(self, master=None):
         QtGui.QMainWindow.__init__(self, master)
@@ -106,7 +111,6 @@ class Player(QtGui.QMainWindow,form_class):
         self.instance = vlc.Instance()
         # creating an empty vlc media player
         self.mediaplayer = self.instance.media_player_new()
-        self.isPaused = False
         self.timer = QtCore.QTimer(self)
         self.timer.setInterval(200)
 
@@ -125,6 +129,14 @@ class Player(QtGui.QMainWindow,form_class):
         self.volumeslider.valueChanged.connect(self.setVolume)
         self.menuExit.triggered.connect(sys.exit)
 
+        self.synVideo.toggle()
+        
+        # Variables
+        self.payload = {}
+        self.payload['isPaused'] = False
+        self.payload['hasQues'] = False
+        self.payload['synVideo'] = True
+
         if self.mediaplayer.play() == -1:
             self.playbutton.setText("Open")
 
@@ -134,6 +146,11 @@ class Player(QtGui.QMainWindow,form_class):
     def postQues (self, position):
         self.popup = PostQues()
         self.popup.show()
+
+    def popupExit(self, values):
+        self.payload['hasQues'] = True
+        for value in values:
+            self.payload[value] = values[value]
 
     def openFile(self, filename=None):
         """Open a media file in a MediaPlayer
@@ -188,23 +205,13 @@ class Player(QtGui.QMainWindow,form_class):
     def playPause(self):
         """Toggle play/pause status
         """
-        buffer = StringIO()
-        c = pycurl.Curl()
         if self.mediaplayer.is_playing():
-            c.setopt(c.URL, 'http://localhost:8000/polls/Pause/')
-            c.setopt(c.WRITEDATA, buffer)
-            c.perform()
-            c.close()
             self.mediaplayer.pause()
             self.playbutton.setText("Play")
             self.playbutton.setIcon(QtGui.QIcon('playButton.png'))
             self.playbutton.setIconSize(QtCore.QSize(24,24))
-            self.isPaused = True
+            self.payload['isPaused'] = True
         else:
-            c.setopt(c.URL, 'http://localhost:8000/polls/Play/')
-            c.setopt(c.WRITEDATA, buffer)
-            c.perform()
-            c.close()
             if self.mediaplayer.play() == -1:
                 self.openFile()
                 return
@@ -213,7 +220,7 @@ class Player(QtGui.QMainWindow,form_class):
             self.playbutton.setIcon(QtGui.QIcon('pauseButton.png'))
             self.playbutton.setIconSize(QtCore.QSize(24,24))
             self.timer.start()
-            self.isPaused = False
+            self.payload['isPaused'] = False
 
 
     def updateUI(self):
@@ -221,7 +228,7 @@ class Player(QtGui.QMainWindow,form_class):
         # setting the slider to the desired position
         self.timeslider.setValue(self.mediaplayer.get_position() * 1000)
         curTime=self.mediaplayer.get_time()/1000
-        if not curTime >= 0:
+        if not curTime>=0:
             curTime=str(-1)
         else:
             sec=curTime%60
@@ -229,31 +236,50 @@ class Player(QtGui.QMainWindow,form_class):
             if minute>=60:
                 minute=minute%60
                 hour=minute/60
-                curTime = str(hour)+':'+str(minute if minute>=10 else '0'+str(minute))+':'+str(sec if sec>=10 else '0'+str(sec))
+                minute = str(minute if minute>=10 else '0'+str(minute))
+                sec = str(sec if sec>=10 else '0'+str(sec))
+                curTime = str(hour) +':'+ minute +':'+ sec
             else:
-                curTime = str(minute if minute>=10 else '0'+str(minute))+':'+str(sec if sec>=10 else '0'+ str(sec))
+                minute = str(minute if minute>=10 else '0'+str(minute))
+                sec = str(sec if sec>=10 else '0'+ str(sec))
+                curTime = minute + ':' + sec 
         self.watchedtime.setText(curTime)
+        #displaying the full length of the video
         fullTime=self.mediaplayer.get_length()/1000
         if not fullTime >=0:
-            fullTime=str(-1)
+            fullTime = str(-1)
         else:
             sec=fullTime%60
             minute=fullTime/60
             if minute>=60:
                 minute=minute%60
                 hour=minute/60
-                fullTime = str(hour)+':'+str(minute if minute>=10 else '0'+ str(minute))+':'+str(sec if sec>=10 else '0' + str(sec))
+                minute = str(minute if minute>=10 else '0'+str(minute))
+                sec = str(sec if sec>=10 else '0'+str(sec))
+                fullTime = str(hour) +':'+ minute +':'+ sec
             else:
-                fullTime = str(minute if minute>=10 else '0' + str(minute))+':'+str(sec if sec>=10 else '0' + str(sec))
+                minute = str(minute if minute>=10 else '0'+str(minute))
+                sec = str(sec if sec>=10 else '0'+ str(sec))
+                fullTime = minute + ':' + sec 
         self.fulltime.setText(fullTime)
 
-        url = 'http://localhost:8000/polls/SetTime/'
-        payload= {'currentPosition':int(self.mediaplayer.get_position()*10000)}
-        r=requests.get(url,params=payload)
+        if self.synVideo.isChecked():
+            self.payload['synVideo'] = True
+        else :
+            self.payload['synVideo'] = False
+#       url = 'http://localhost:8000/polls/SetTime/'
+        self.payload['currentPosition']=int(self.mediaplayer.get_position()*10000)
+#       r=requests.get(url,params=payload)
+        data = json.dumps(self.payload)
+        data = {'data':data}
+        url = 'http://localhost:8000/polls/PostCurSet/'
+        r = requests.get(url,params = data)
+        if self.payload['hasQues'] == True:
+            self.payload['hasQues'] = False      #   The question has been sent so....
         if not self.mediaplayer.is_playing():
             # no need to call this function if nothing is played
             self.timer.stop()
-            if not self.isPaused:
+            if not self.payload['isPaused']:
                 # after the video finished, the play button stills show
                 # "Pause", not the desired behavior of a media player
                 # this will fix it

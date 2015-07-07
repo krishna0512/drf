@@ -8,7 +8,8 @@ from PyQt4 import QtGui, QtCore, uic
 form_class = uic.loadUiType("chat.ui")[0]
 
 class Chat(QtGui.QMainWindow,form_class):
-    """A simple Media Player using VLC and Qt
+    """
+        A simple chat box
     """
     def __init__(self, master=None):
         QtGui.QMainWindow.__init__(self, master)

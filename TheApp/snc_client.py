@@ -10,7 +10,9 @@ form_class = uic.loadUiType("clientUi.ui")[0]
 
 
 class PopupQues(QtGui.QDialog):
-
+    '''
+        A simple class to present question to check presence
+    '''
     def __init__(self,master=None):
         QtGui.QMainWindow.__init__(self, master)
         self.lbl1 = QtGui.QLabel(str(master.question), self)
@@ -59,7 +61,7 @@ class PopupQues(QtGui.QDialog):
 
 
 class Player(QtGui.QMainWindow,form_class):
-    """A simple Media Player using VLC and Qt
+    """A simple Media Player using VLC and Qt for client side
     """
     def __init__(self, master=None):
         QtGui.QMainWindow.__init__(self, master)
@@ -209,9 +211,13 @@ class Player(QtGui.QMainWindow,form_class):
             if minute>=60:
                 minute=minute%60
                 hour=minute/60
-                curTime = str(hour)+':'+str(minute if minute>=10 else '0'+str(minute))+':'+str(sec if sec>=10 else '0'+str(sec))
+                minute = str(minute if minute>=10 else '0'+str(minute))
+                sec = str(sec if sec>=10 else '0'+str(sec))
+                curTime = str(hour) +':'+ minute +':'+ sec
             else:
-                curTime = str(minute if minute>=10 else '0'+str(minute))+':'+str(sec if sec>=10 else '0'+ str(sec))
+                minute = str(minute if minute>=10 else '0'+str(minute))
+                sec = str(sec if sec>=10 else '0'+ str(sec))
+                curTime = minute + ':' + sec 
         self.watchedtime.setText(curTime)
         #displaying the full length of the video
         fullTime=self.mediaplayer.get_length()/1000
@@ -223,9 +229,13 @@ class Player(QtGui.QMainWindow,form_class):
             if minute>=60:
                 minute=minute%60
                 hour=minute/60
-                fullTime = str(hour)+':'+str(minute if minute>=10 else '0'+ str(minute))+':'+str(sec if sec>=10 else '0' + str(sec))
+                minute = str(minute if minute>=10 else '0'+str(minute))
+                sec = str(sec if sec>=10 else '0'+str(sec))
+                fullTime = str(hour) +':'+ minute +':'+ sec
             else:
-                fullTime = str(minute if minute>=10 else '0' + str(minute))+':'+str(sec if sec>=10 else '0' + str(sec))
+                minute = str(minute if minute>=10 else '0'+str(minute))
+                sec = str(sec if sec>=10 else '0'+ str(sec))
+                fullTime = minute + ':' + sec 
         self.fulltime.setText(fullTime)
 
         if not self.mediaplayer.is_playing():
