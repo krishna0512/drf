@@ -103,7 +103,7 @@ p, li { white-space: pre-wrap; }
      </rect>
     </property>
    </widget>
-   <widget class="QRadioButton" name="isAns_2">
+   <widget class="QRadioButton" name="isChat">
     <property name="geometry">
      <rect>
       <x>0</x>
@@ -114,6 +114,9 @@ p, li { white-space: pre-wrap; }
     </property>
     <property name="text">
      <string>As Chat</string>
+    </property>
+    <property name="checked">
+     <bool>true</bool>
     </property>
    </widget>
    <widget class="QLabel" name="label">
