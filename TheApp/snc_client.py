@@ -198,11 +198,9 @@ class Player(QtGui.QMainWindow,form_class):
         #getting the position of the server video
         a = float(self.curPosition)
         if (a != ''):
-            #a = int(a)
             a=a
         else:
             a=0
-        #print str(curPos)+' '+str(a/10)
         if abs(curPos-a/10)>=4.5:
             self.setPosition(a/10)
         #self.mediaplayer.set_time(length*self.mediaplayer.get_position())
@@ -210,7 +208,6 @@ class Player(QtGui.QMainWindow,form_class):
     def updateUI(self):
         """updates the user interface"""
         # setting the slider to the desired position
-        print 'isPlaying: '+str(self.isPlaying)+' isPaused: '+str(self.isPaused)+' syn: '+str(self.sync)+' Play: '+str(self.Play)+str(randint(1,10))
         url = 'http://localhost:8000/polls/GetCurSet/'
         r=requests.get(url)
         self.data = json.loads(r.text)
@@ -220,8 +217,6 @@ class Player(QtGui.QMainWindow,form_class):
             self.Play = self.isPlaying
             self.isPaused = not self.isPlaying
             self.updatePosition()
-#       elif self.sync != self.lastState:
-#           self.Play = self.isPaused
         
         self.curPosition = self.data['curTime']
         self.haveQues = self.data['haveQues']
@@ -234,7 +229,7 @@ class Player(QtGui.QMainWindow,form_class):
             self.popup.show()
 
 
-        self.timeslider.setValue(self.mediaplayer.get_position() * 1000)
+         self.timeslider.setValue(self.mediaplayer.get_position() * 1000)
         #displaying the current time of the video
         curTime=self.mediaplayer.get_time()/1000
         if not curTime>=0:
@@ -274,8 +269,10 @@ class Player(QtGui.QMainWindow,form_class):
 
         if (self.isPlaying != self.previousStatus or self.sync != self.lastState) and self.sync :
             self.playPause()
+
         self.previousStatus = self.isPlaying
         self.lastState = self.sync
+
         if not self.mediaplayer.is_playing():
             # no need to call this function if nothing is played
             if not self.isPaused:

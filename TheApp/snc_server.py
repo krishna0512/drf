@@ -81,11 +81,13 @@ class PostQues(QtGui.QWidget):
                 currectAns.append(True)
             else:
                 currectAns.append(False)
-        url = 'http://localhost:8000/polls/PostQues/'
-        payload = {'options':options, 'ques':question, 'currectAnswer':currectAns}
-#       master.popupExit(payload)
-        r=requests.get(url,params=payload)
-        self.hide()
+        if not currectAns or not options:
+            
+        else:
+            url = 'http://localhost:8000/polls/PostQues/'
+            payload = {'options':options, 'ques':question, 'currectAnswer':currectAns}
+            r=requests.get(url,params=payload)
+            self.hide()
     
     def closeEvent(self, event):
         reply = QtGui.QMessageBox.question(self, 'Message',
