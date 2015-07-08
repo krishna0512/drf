@@ -120,7 +120,6 @@ class Player(QtGui.QMainWindow,form_class):
         self.playbutton.clicked.connect(self.playPause)
         self.stopbutton.clicked.connect(self.stop)
         self.postbutton.clicked.connect(self.postQues)
-        self.menuOpen.triggered.connect(self.openFile)
         self.playbutton.setIcon(QtGui.QIcon('playButton.png'))
         self.playbutton.setIconSize(QtCore.QSize(24,24))
         self.stopbutton.setIcon(QtGui.QIcon('stopButton.png'))
@@ -185,6 +184,7 @@ class Player(QtGui.QMainWindow,form_class):
             self.mediaplayer.set_hwnd(self.videoframe.winId())
         elif sys.platform == "darwin": # for MacOS
             self.mediaplayer.set_nsobject(self.videoframe.winId())
+        self.timer.start()
         self.playbutton.setText("Play")
         self.playPause()
 
@@ -219,7 +219,6 @@ class Player(QtGui.QMainWindow,form_class):
             self.playbutton.setText("Pause")
             self.playbutton.setIcon(QtGui.QIcon('pauseButton.png'))
             self.playbutton.setIconSize(QtCore.QSize(24,24))
-            self.timer.start()
             self.payload['isPaused'] = False
 
 
@@ -278,7 +277,6 @@ class Player(QtGui.QMainWindow,form_class):
             self.payload['hasQues'] = False      #   The question has been sent so....
         if not self.mediaplayer.is_playing():
             # no need to call this function if nothing is played
-            self.timer.stop()
             if not self.payload['isPaused']:
                 # after the video finished, the play button stills show
                 # "Pause", not the desired behavior of a media player

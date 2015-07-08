@@ -3,6 +3,7 @@ import vlc
 import pycurl
 import requests
 import json
+from random import randint
 from StringIO import StringIO
 from PyQt4 import QtGui, QtCore, uic
 
@@ -72,22 +73,33 @@ class Player(QtGui.QMainWindow,form_class):
         self.instance = vlc.Instance()
         # creating an empty vlc media player
         self.mediaplayer = self.instance.media_player_new()
-        self.isPaused = False
         self.timer = QtCore.QTimer(self)
         self.timer.setInterval(200)
 
         # Connection setups
-        self.menuOpen.triggered.connect(self.openFile)
         self.timer.timeout.connect(self.updateUI)
+        self.timeslider.sliderMoved.connect(self.setPosition)
+        self.playbutton.clicked.connect(self.asynPlay)
+        self.stopbutton.clicked.connect(self.stop)
+        self.playbutton.setIcon(QtGui.QIcon('playButton.png'))
+        self.playbutton.setIconSize(QtCore.QSize(24,24))
+        self.stopbutton.setIcon(QtGui.QIcon('stopButton.png'))
+        self.stopbutton.setIconSize(QtCore.QSize(24,24))
         self.volumeslider.setValue(self.mediaplayer.audio_get_volume())
         self.volumeslider.valueChanged.connect(self.setVolume)
+        self.menuOpen.triggered.connect(self.openFile)
+        self.menuExit.triggered.connect(sys.exit)
 
-        #global variables
+        #variables
         self.data = {}
         self.isPlaying = False
+        self.isPaused = False
+        self.haveQues = False
+        self.sync = False
+        self.Play = True
         self.curPosition = 0
         self.previousStatus = ''
-        self.haveQues = False
+        self.lastState = ''
         self.QuesSet = []
 
         if self.mediaplayer.play() == -1:
@@ -100,6 +112,7 @@ class Player(QtGui.QMainWindow,form_class):
     def openFile(self, filename=None):
         """Open a media file in a MediaPlayer
         """
+        print 'in openfile'
         if filename is None:
             filename = QtGui.QFileDialog.getOpenFileName(self, "Open File", os.path.expanduser('~'))
         if not filename:
@@ -128,13 +141,15 @@ class Player(QtGui.QMainWindow,form_class):
             self.mediaplayer.set_hwnd(self.videoframe.winId())
         elif sys.platform == "darwin": # for MacOS
             self.mediaplayer.set_nsobject(self.videoframe.winId())
-        self.playbutton.setText("Play")
         self.timer.start()
+        self.playbutton.setText("Play")
+        self.playPause()
 
 
     def stop(self):
         """Stop player
         """
+        print 'in stop'
         self.mediaplayer.stop()
         self.playbutton.setText("Play")
 
@@ -147,26 +162,37 @@ class Player(QtGui.QMainWindow,form_class):
     def playPause(self):
         """Toggle play/pause status (can only be used for client side.)
         """
-        status = str(self.isPlaying)
+        print 'play pause'
+        if self.Play:
+            print 1
+            if self.mediaplayer.play() == -1:
+                self.openFile()
+                return
+            self.mediaplayer.play()
+            self.playbutton.setText("Pause")
+            self.playbutton.setIcon(QtGui.QIcon('pauseButton.png'))
+            self.playbutton.setIconSize(QtCore.QSize(24,24))
+            self.isPaused = False
+        else :
+            print 2
+            self.mediaplayer.pause()
+            self.playbutton.setText("Play")
+            self.playbutton.setIcon(QtGui.QIcon('playButton.png'))
+            self.playbutton.setIconSize(QtCore.QSize(24,24))
+            self.isPaused = True
 
-        if status != self.previousStatus:
-            if (status == 'True'):
-                if self.mediaplayer.play() == -1:
-                    self.openFile()
-                    return
-                self.mediaplayer.play()
-                self.playbutton.setText("Pause")
-                self.isPaused = False
-            else:
-                self.mediaplayer.pause()
-                self.playbutton.setText("Play")
-                self.isPaused = True
-        self.previousStatus = status
+    def asynPlay(self):
+        if not self.sync:
+            self.isPaused = not self.isPaused
+            self.Play = not self.isPaused
+            self.playPause()
+
 
     def popupExit(self):
         print 'exit'
 
     def updatePosition (self):
+#       print 'in updatePosition'
         curPos=self.mediaplayer.get_position()*1000
         buffer = StringIO()
         #getting the position of the server video
@@ -184,10 +210,19 @@ class Player(QtGui.QMainWindow,form_class):
     def updateUI(self):
         """updates the user interface"""
         # setting the slider to the desired position
+        print 'isPlaying: '+str(self.isPlaying)+' isPaused: '+str(self.isPaused)+' syn: '+str(self.sync)+' Play: '+str(self.Play)+str(randint(1,10))
         url = 'http://localhost:8000/polls/GetCurSet/'
         r=requests.get(url)
         self.data = json.loads(r.text)
+        self.sync = self.data ['synVideo']
         self.isPlaying = self.data['isPlaying']
+        if self.sync:
+            self.Play = self.isPlaying
+            self.isPaused = not self.isPlaying
+            self.updatePosition()
+#       elif self.sync != self.lastState:
+#           self.Play = self.isPaused
+        
         self.curPosition = self.data['curTime']
         self.haveQues = self.data['haveQues']
 
@@ -199,7 +234,6 @@ class Player(QtGui.QMainWindow,form_class):
             self.popup.show()
 
 
-        self.updatePosition()
         self.timeslider.setValue(self.mediaplayer.get_position() * 1000)
         #displaying the current time of the video
         curTime=self.mediaplayer.get_time()/1000
@@ -238,6 +272,10 @@ class Player(QtGui.QMainWindow,form_class):
                 fullTime = minute + ':' + sec 
         self.fulltime.setText(fullTime)
 
+        if (self.isPlaying != self.previousStatus or self.sync != self.lastState) and self.sync :
+            self.playPause()
+        self.previousStatus = self.isPlaying
+        self.lastState = self.sync
         if not self.mediaplayer.is_playing():
             # no need to call this function if nothing is played
             if not self.isPaused:
@@ -245,7 +283,6 @@ class Player(QtGui.QMainWindow,form_class):
                 # "Pause", not the desired behavior of a media player
                 # this will fix it
                 self.stop()
-        self.playPause()
 
 
 if __name__ == "__main__":
