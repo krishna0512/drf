@@ -152,6 +152,13 @@ p, li { white-space: pre-wrap; }
     <addaction name="menuTimed"/>
     <addaction name="menuThreaded"/>
    </widget>
+   <widget class="QMenu" name="menuFile">
+    <property name="title">
+     <string>File</string>
+    </property>
+    <addaction name="menuExit"/>
+   </widget>
+   <addaction name="menuFile"/>
    <addaction name="menuView"/>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
@@ -172,6 +179,11 @@ p, li { white-space: pre-wrap; }
    </property>
    <property name="text">
     <string>Threaded</string>
+   </property>
+  </action>
+  <action name="menuExit">
+   <property name="text">
+    <string>Exit</string>
    </property>
   </action>
  </widget>

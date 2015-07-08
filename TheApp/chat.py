@@ -39,6 +39,7 @@ class Chat(QtGui.QMainWindow,form_class):
         self.resetButton.clicked.connect(self.reset)
         self.menuTimed.triggered.connect(self.changeViewToTimed)
         self.menuThreaded.triggered.connect(self.changeViewToThreaded)
+        self.menuExit.triggered.connect(sys.exit)
         self.currentView = 'Timed'
         self.isViewChanged = False
 
@@ -58,6 +59,13 @@ class Chat(QtGui.QMainWindow,form_class):
         self.textBrowser.setText(r.text)
 
         self.timer.start()
+
+    def keyPressEvent (self, event):
+        mod = QtGui.QApplication.keyboardModifiers()
+        if mod == QtCore.Qt.ControlModifier:
+            key = event.key()
+            if key == QtCore.Qt.Key_Return:
+                self.submitButton.animateClick()
 
     def reset(self):
     	self.textArea.setText('')
