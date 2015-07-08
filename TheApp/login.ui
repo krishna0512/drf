@@ -55,9 +55,6 @@
     <property name="text">
      <string>Username</string>
     </property>
-    <property name="buddy">
-     <cstring>username</cstring>
-    </property>
    </widget>
    <widget class="QLabel" name="passwordLabel">
     <property name="geometry">
@@ -70,35 +67,6 @@
     </property>
     <property name="text">
      <string>Password</string>
-    </property>
-    <property name="buddy">
-     <cstring>password</cstring>
-    </property>
-   </widget>
-   <widget class="QTextEdit" name="password">
-    <property name="geometry">
-     <rect>
-      <x>100</x>
-      <y>80</y>
-      <width>261</width>
-      <height>27</height>
-     </rect>
-    </property>
-    <property name="tabChangesFocus">
-     <bool>true</bool>
-    </property>
-   </widget>
-   <widget class="QTextEdit" name="username">
-    <property name="geometry">
-     <rect>
-      <x>100</x>
-      <y>30</y>
-      <width>261</width>
-      <height>27</height>
-     </rect>
-    </property>
-    <property name="tabChangesFocus">
-     <bool>true</bool>
     </property>
    </widget>
    <widget class="QPushButton" name="loginButton">
@@ -130,6 +98,29 @@
      <string>Cancel</string>
     </property>
    </widget>
+   <widget class="QLineEdit" name="username">
+    <property name="geometry">
+     <rect>
+      <x>100</x>
+      <y>30</y>
+      <width>261</width>
+      <height>27</height>
+     </rect>
+    </property>
+   </widget>
+   <widget class="QLineEdit" name="password">
+    <property name="geometry">
+     <rect>
+      <x>100</x>
+      <y>80</y>
+      <width>261</width>
+      <height>27</height>
+     </rect>
+    </property>
+    <property name="echoMode">
+     <enum>QLineEdit::Password</enum>
+    </property>
+   </widget>
   </widget>
   <widget class="QMenuBar" name="menubar">
    <property name="geometry">
@@ -147,9 +138,42 @@
   <tabstop>username</tabstop>
   <tabstop>password</tabstop>
   <tabstop>loginButton</tabstop>
-  <tabstop>cancelButton</tabstop>
   <tabstop>registerButton</tabstop>
+  <tabstop>cancelButton</tabstop>
  </tabstops>
  <resources/>
- <connections/>
+ <connections>
+  <connection>
+   <sender>password</sender>
+   <signal>returnPressed()</signal>
+   <receiver>loginButton</receiver>
+   <slot>animateClick()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>310</x>
+     <y>126</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>351</x>
+     <y>254</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>username</sender>
+   <signal>returnPressed()</signal>
+   <receiver>loginButton</receiver>
+   <slot>animateClick()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>302</x>
+     <y>71</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>315</x>
+     <y>260</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
 </ui>

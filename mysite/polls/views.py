@@ -98,16 +98,20 @@ def PostInsertQuery (request):
 
 def GetInsertQuery (request):
     s = ''
+    data = str (request.GET['data'])
+    # state can be either threaded or timed..
+    state = str (request.GET['state'])
+    # This is the temporary timestamp view
     for i in Post.objects.all():
         if i.isQues == True:
             s += 'Q' + str(i.id) + ' ' + str(i.fromUser) + ':\n' + str(i.message) + '\n'
             for j in i.comment_set.all():
-                s += str(j.fromUser) + ':\n' + str(j.message) + '\n'
+                s += 'A' + str(i.id) + ' ' + str(j.fromUser) + ':\n' + str(j.message) + '\n'
         else:
-            s += str(i.fromUser) + ':\n' + str(i.message) + '\n'
-
-            
-
+            if state == 'Timed':
+                s += str(i.fromUser) + ':\n' + str(i.message) + '\n'
+            else:
+                pass
     return HttpResponse(str(s))
 
 def Register (request):

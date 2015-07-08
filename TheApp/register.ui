@@ -25,9 +25,6 @@
    <property name="text">
     <string>Username</string>
    </property>
-   <property name="buddy">
-    <cstring>username</cstring>
-   </property>
   </widget>
   <widget class="QLabel" name="passwordLabel">
    <property name="geometry">
@@ -40,9 +37,6 @@
    </property>
    <property name="text">
     <string>Password</string>
-   </property>
-   <property name="buddy">
-    <cstring>password</cstring>
    </property>
   </widget>
   <widget class="QLabel" name="emailLabel">
@@ -57,9 +51,6 @@
    <property name="text">
     <string>Email Id</string>
    </property>
-   <property name="buddy">
-    <cstring>email</cstring>
-   </property>
   </widget>
   <widget class="QLabel" name="fnameLabel">
    <property name="geometry">
@@ -73,9 +64,6 @@
    <property name="text">
     <string>Fisrt Name</string>
    </property>
-   <property name="buddy">
-    <cstring>fname</cstring>
-   </property>
   </widget>
   <widget class="QLabel" name="lnameLabel">
    <property name="geometry">
@@ -88,59 +76,6 @@
    </property>
    <property name="text">
     <string>Last Name</string>
-   </property>
-   <property name="buddy">
-    <cstring>lname</cstring>
-   </property>
-  </widget>
-  <widget class="QPlainTextEdit" name="username">
-   <property name="geometry">
-    <rect>
-     <x>150</x>
-     <y>40</y>
-     <width>261</width>
-     <height>28</height>
-    </rect>
-   </property>
-  </widget>
-  <widget class="QPlainTextEdit" name="password">
-   <property name="geometry">
-    <rect>
-     <x>150</x>
-     <y>80</y>
-     <width>261</width>
-     <height>28</height>
-    </rect>
-   </property>
-  </widget>
-  <widget class="QPlainTextEdit" name="email">
-   <property name="geometry">
-    <rect>
-     <x>150</x>
-     <y>120</y>
-     <width>261</width>
-     <height>28</height>
-    </rect>
-   </property>
-  </widget>
-  <widget class="QPlainTextEdit" name="fname">
-   <property name="geometry">
-    <rect>
-     <x>150</x>
-     <y>160</y>
-     <width>261</width>
-     <height>28</height>
-    </rect>
-   </property>
-  </widget>
-  <widget class="QPlainTextEdit" name="lname">
-   <property name="geometry">
-    <rect>
-     <x>150</x>
-     <y>200</y>
-     <width>261</width>
-     <height>28</height>
-    </rect>
    </property>
   </widget>
   <widget class="QPushButton" name="okButton">
@@ -182,13 +117,61 @@
     <string>Register as TA?</string>
    </property>
   </widget>
+  <widget class="QLineEdit" name="username">
+   <property name="geometry">
+    <rect>
+     <x>150</x>
+     <y>40</y>
+     <width>261</width>
+     <height>28</height>
+    </rect>
+   </property>
+  </widget>
+  <widget class="QLineEdit" name="password">
+   <property name="geometry">
+    <rect>
+     <x>150</x>
+     <y>80</y>
+     <width>261</width>
+     <height>28</height>
+    </rect>
+   </property>
+   <property name="echoMode">
+    <enum>QLineEdit::Password</enum>
+   </property>
+  </widget>
+  <widget class="QLineEdit" name="email">
+   <property name="geometry">
+    <rect>
+     <x>150</x>
+     <y>120</y>
+     <width>261</width>
+     <height>28</height>
+    </rect>
+   </property>
+  </widget>
+  <widget class="QLineEdit" name="fname">
+   <property name="geometry">
+    <rect>
+     <x>150</x>
+     <y>160</y>
+     <width>261</width>
+     <height>28</height>
+    </rect>
+   </property>
+  </widget>
+  <widget class="QLineEdit" name="lname">
+   <property name="geometry">
+    <rect>
+     <x>150</x>
+     <y>200</y>
+     <width>261</width>
+     <height>28</height>
+    </rect>
+   </property>
+  </widget>
  </widget>
  <tabstops>
-  <tabstop>username</tabstop>
-  <tabstop>password</tabstop>
-  <tabstop>email</tabstop>
-  <tabstop>fname</tabstop>
-  <tabstop>lname</tabstop>
   <tabstop>checkBox</tabstop>
   <tabstop>okButton</tabstop>
   <tabstop>cancelButton</tabstop>

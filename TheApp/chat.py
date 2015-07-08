@@ -37,6 +37,10 @@ class Chat(QtGui.QMainWindow,form_class):
 
         self.submitButton.clicked.connect(self.submit)
         self.resetButton.clicked.connect(self.reset)
+        self.menuTimed.triggered.connect(self.changeViewToTimed)
+        self.menuThreaded.triggered.connect(self.changeViewToThreaded)
+        self.currentView = 'Timed'
+        self.isViewChanged = False
 
         self.timer = QtCore.QTimer(self)
         self.timer.setInterval(500)
@@ -83,13 +87,30 @@ class Chat(QtGui.QMainWindow,form_class):
                 self.textArea.setText('')
             # updates the messages retrived from the server
             self.updateMessage()
+
+    def changeViewToTimed (self):
+        self.menuThreaded.setChecked (False)
+        self.currentView = 'Timed'
+        self.isViewChanged = True
+        pass
+
+    def changeViewToThreaded (self):
+        self.menuTimed.setChecked (False)
+        self.currentView = 'Threaded'
+        self.isViewChanged = True
+        pass
+
    
     def updateMessage(self):
-        # Get all the messages from the database
         url = 'http://localhost:8000/polls/GetInsertQuery/'
-        message = str(requests.get(url).text).strip()
+        original =  str(self.textBrowser.toPlainText()).strip()
+        # state can be threaded for threaded view or timed for timestamp view
+        # give state = timed for timestamp view and any other value for threaded view
+        payload = {'data' : str(original[-50:]), 'state' : self.currentView}
+        message = str(requests.get(url, params=payload).text).strip()
         # This is checking and updating the messages only when there is a change
-        if str(self.textBrowser.toPlainText()).strip() != message:
+        if original != message or self.isViewChanged is True:
+            self.isViewChanged = False
     	    self.textBrowser.setText(message)
             # Moves the scroll to the bottom
             self.textBrowser.moveCursor(QtGui.QTextCursor.End)
