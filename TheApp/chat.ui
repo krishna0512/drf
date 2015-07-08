@@ -103,7 +103,7 @@ p, li { white-space: pre-wrap; }
      </rect>
     </property>
    </widget>
-   <widget class="QRadioButton" name="isAns_2">
+   <widget class="QRadioButton" name="isChat">
     <property name="geometry">
      <rect>
       <x>0</x>
@@ -114,6 +114,9 @@ p, li { white-space: pre-wrap; }
     </property>
     <property name="text">
      <string>As Chat</string>
+    </property>
+    <property name="checked">
+     <bool>true</bool>
     </property>
    </widget>
    <widget class="QLabel" name="label">
@@ -128,6 +131,9 @@ p, li { white-space: pre-wrap; }
     <property name="text">
      <string>Tag:</string>
     </property>
+    <property name="buddy">
+     <cstring>tagArea</cstring>
+    </property>
    </widget>
   </widget>
   <widget class="QMenuBar" name="menubar">
@@ -139,9 +145,58 @@ p, li { white-space: pre-wrap; }
      <height>25</height>
     </rect>
    </property>
+   <widget class="QMenu" name="menuView">
+    <property name="title">
+     <string>View</string>
+    </property>
+    <addaction name="menuTimed"/>
+    <addaction name="menuThreaded"/>
+   </widget>
+   <widget class="QMenu" name="menuFile">
+    <property name="title">
+     <string>File</string>
+    </property>
+    <addaction name="menuExit"/>
+   </widget>
+   <addaction name="menuFile"/>
+   <addaction name="menuView"/>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
+  <action name="menuTimed">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="checked">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Timed</string>
+   </property>
+  </action>
+  <action name="menuThreaded">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Threaded</string>
+   </property>
+  </action>
+  <action name="menuExit">
+   <property name="text">
+    <string>Exit</string>
+   </property>
+  </action>
  </widget>
+ <tabstops>
+  <tabstop>textArea</tabstop>
+  <tabstop>isChat</tabstop>
+  <tabstop>isQues</tabstop>
+  <tabstop>isAns</tabstop>
+  <tabstop>tagArea</tabstop>
+  <tabstop>submitButton</tabstop>
+  <tabstop>resetButton</tabstop>
+  <tabstop>textBrowser</tabstop>
+ </tabstops>
  <resources/>
  <connections/>
 </ui>

@@ -42,7 +42,7 @@ class Register(QtGui.QDialog,form2_class):
 
     def register(self):
         for i in ('username','password','email','fname','lname'):
-            exec ("%sValue = str(self.%s.toPlainText()).strip()" % (i,i))
+            exec ("%sValue = str(self.%s.text()).strip()" % (i,i))
         isTA = self.checkBox.isChecked()
         if all(a != '' for a in (usernameValue, passwordValue, emailValue, fnameValue, lnameValue)):
             payload = {
@@ -88,8 +88,8 @@ class Login(QtGui.QMainWindow,form_class):
         self.dlgw=[]
 
     def login(self):
-        usernameValue =str(self.username.toPlainText()).strip()
-        passwordValue =str(self.password.toPlainText()).strip()
+        usernameValue =str(self.username.text()).strip()
+        passwordValue =str(self.password.text()).strip()
         if usernameValue == '' or passwordValue == '':
             self.dlg=Dialog('Field Missing!')
             self.dlg.show()
@@ -100,7 +100,6 @@ class Login(QtGui.QMainWindow,form_class):
                     }
             url = 'http://localhost:8000/polls/Login/'
             r = requests.get(url,params=payload)
-            print r.text
             if r.text == '':
                 self.dlg = Dialog("username or password incorrect")
                 self.dlg.show()

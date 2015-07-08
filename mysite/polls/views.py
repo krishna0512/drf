@@ -4,7 +4,9 @@ from polls.models import *
 from django.contrib.auth.models import User, Group
 from django.contrib.auth import authenticate, login, logout
 from django.utils import timezone
+from operator import itemgetter
 import requests
+import datetime
 import json
 
 
@@ -138,22 +140,67 @@ def PostInsertQuery (request):
         q = Post.objects.get(id=tag) 
         q.comment_set.create(message = message, fromUser = name, timestamp = timezone.now())
     else:
-        q = Post(message = message, fromUser = name, timestamp = timezone.now())
+        q = Post.objects.all().order_by('-id')[0]
+        if str(q.fromUser) == name and q.timestamp + datetime.timedelta(minutes=3) > timezone.now() and not q.isQues:
+            q.message += '\n' + message
+            q.timestamp = timezone.now()
+            q.save()
+        else:
+            q = Post(message = message, fromUser = name, timestamp = timezone.now())
     q.save()
     return HttpResponse(name)
 
 def GetInsertQuery (request):
     s = ''
-    for post in Post.objects.all().order_by('timestamp'):
-        if post.isQues == True:
-            s += 'Q' + str(post.id) + ' ' + str(post.fromUser) + ':\n' + str(post.message) + '\n'
-            for ans in post.comment_set.all().order_by('timestamp'):
-                s += str(ans.fromUser) + ':\n' + str(ans.message) + '\n'
-        else:
-            s += str(post.fromUser) + ':\n' + str(post.message) + '\n'
-    s+='\n'
+    data = str (request.GET['data'])
+    # state can be either threaded or timed..
+    state = str (request.GET['state'])
 
-    return HttpResponse(str(s))
+    #lastpostid = 0
+    #lastcommentid = 0
+    # This is the temporary timestamp view
+
+    if state == 'Threaded':
+        for i in Post.objects.all():
+            if i.isQues == True:
+                s += 'Q' + str(i.id) + ' ' + str(i.fromUser) + ':\n' + str(i.message) + '\n'
+                for j in i.comment_set.all():
+                    s += 'A' + str(i.id) + ' ' + str(j.fromUser) + ':\n' + str(j.message) + '\n'
+            #else:
+                #if state == 'Timed':
+                    #s += str(i.fromUser) + ':\n' + str(i.message) + '\n'
+    elif state == 'Timed':
+        a = []
+        for i in Post.objects.all():
+            b = {}
+            b['id'] = i.id
+            b['message'] = i.message
+            b['fromUser'] = i.fromUser
+            b['timestamp'] = i.timestamp
+            b['isQues'] = i.isQues
+            a.append(b)
+        for i in Comment.objects.all():
+            b={}
+            b['id'] = i.post.id
+            b['message'] = i.message
+            b['timestamp'] = i.timestamp
+            b['fromUser'] = i.fromUser
+            b['isQues'] = False
+            b['isAns'] = True
+            a.append(b)
+        # Sort the combined list using the key 'timestamp'
+        sortedList = sorted (a, key=itemgetter('timestamp'))
+        s = ''
+        for i in sortedList:
+            if i['isQues'] == True:
+                s += 'Q' + str(i['id']) + ' ' + str(i['fromUser']) + ':\n' + str(i['message']) + '\n'
+            elif i['isQues'] is False and i.has_key('isAns') and i['isAns'] is True:
+                s += 'A' + str(i['id']) + ' ' + str(i['fromUser']) + ':\n' + str(i['message']) + '\n'
+            else:
+                s += str(i['fromUser']) + ':\n' + str(i['message']) + '\n'
+
+
+    return HttpResponse(str(s).strip())
 
 def Register (request):
     # Duplicate Users Integrity Error can be checked using status_code of r
