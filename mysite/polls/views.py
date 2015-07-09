@@ -2,6 +2,7 @@ from django.shortcuts import render
 from django.http import HttpResponse
 from polls.models import *
 from django.contrib.auth.models import User, Group
+from django.contrib.sessions.models import Session
 from django.contrib.auth import authenticate, login, logout
 from django.utils import timezone
 from operator import itemgetter
@@ -235,4 +236,21 @@ def Logout (request):
         logout(request)
     return HttpResponse('')
 
+
+def GetLoggedinUsers (request):
+    s = Session.objects.filter (expire_date__gte=timezone.now())
+    uid = []
+    for i in s:
+        uid.append(i.get_decoded().get('_auth_user_id', None))
+    a = User.objects.filter(id__in=uid)
+    s = [i.username for i in a]
+    return HttpResponse (json.dumps(s))
+
+def GetAllUsers (request):
+    ta      = Group.objects.filter(name='TA')[0]
+    student = Group.objects.filter(name='Student')[0]
+    t = [i.username for i in ta.user_set.all()]
+    s = [i.username for i in student.user_set.all()]
+    ret = {'ta':t, 'student':s}
+    return HttpResponse (json.dumps(ret))
 

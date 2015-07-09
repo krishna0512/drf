@@ -264,13 +264,8 @@ class Player(QtGui.QMainWindow,form_class):
             self.playbutton.setIcon(QtGui.QIcon('pauseButton.png'))
             self.playbutton.setIconSize(QtCore.QSize(24,24))
             self.payload['isPaused'] = False
-
-
-    def updateUI(self):
-        """updates the user interface"""
-        # setting the slider to the desired position
-        self.timeslider.setValue(self.mediaplayer.get_position() * 1000)
-        curTime=self.mediaplayer.get_time()/1000
+    
+    def theTime(self, curTime):
         if not curTime>=0:
             curTime=str(-1)
         else:
@@ -286,25 +281,18 @@ class Player(QtGui.QMainWindow,form_class):
                 minute = str(minute if minute>=10 else '0'+str(minute))
                 sec = str(sec if sec>=10 else '0'+ str(sec))
                 curTime = minute + ':' + sec 
-        self.watchedtime.setText(curTime)
+        return curTime
+
+    def updateUI(self):
+        """updates the user interface"""
+        # setting the slider to the desired position
+        self.timeslider.setValue(self.mediaplayer.get_position() * 1000)
+        #displaying the current position of the video
+        curTime=self.mediaplayer.get_time()/1000
+        self.watchedtime.setText(self.theTime(curTime))
         #displaying the full length of the video
         fullTime=self.mediaplayer.get_length()/1000
-        if not fullTime >=0:
-            fullTime = str(-1)
-        else:
-            sec=fullTime%60
-            minute=fullTime/60
-            if minute>=60:
-                minute=minute%60
-                hour=minute/60
-                minute = str(minute if minute>=10 else '0'+str(minute))
-                sec = str(sec if sec>=10 else '0'+str(sec))
-                fullTime = str(hour) +':'+ minute +':'+ sec
-            else:
-                minute = str(minute if minute>=10 else '0'+str(minute))
-                sec = str(sec if sec>=10 else '0'+ str(sec))
-                fullTime = minute + ':' + sec 
-        self.fulltime.setText(fullTime)
+        self.fulltime.setText(self.theTime(fullTime))
 
         if self.synVideo.isChecked():
             self.payload['synVideo'] = True
@@ -317,12 +305,8 @@ class Player(QtGui.QMainWindow,form_class):
         r = requests.get(url,params = data)
         if self.payload['hasQues'] == True:
             self.payload['hasQues'] = False      #   The question has been sent so....
-        if not self.mediaplayer.is_playing():
-            # no need to call this function if nothing is played
+        if not self.mediaplayer.is_playing():    #   Check if somrthing is playing or paused else stop it  
             if not self.payload['isPaused']:
-                # after the video finished, the play button stills show
-                # "Pause", not the desired behavior of a media player
-                # this will fix it
                 self.stop()
 
 if __name__ == "__main__":

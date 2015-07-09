@@ -13,5 +13,7 @@ urlpatterns = [
     url(r'^Register/', Register, name='Register'),
     url(r'^Login/', Login, name='Login'),
     url(r'^GetUserDetail/', GetUserDetail, name='GetUserDetail'),
-    url(r'^Logout/', Logout, name='Logout')
+    url(r'^Logout/', Logout, name='Logout'),
+    url(r'^GetLoggedinUsers/', GetLoggedinUsers, name='GetLoggedinUsers'),
+    url(r'^GetAllUsers/', GetAllUsers, name='GetAllUsers')
 ]

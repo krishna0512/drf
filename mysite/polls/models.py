@@ -24,7 +24,7 @@ class Choice(models.Model):
     choice_text     = models.CharField ('Choice Text', max_length=20000)
     isCurrect       = models.BooleanField ('is Correct', default=False)
 
-class Session(models.Model):
-    startedBy       = models.OneToOneField(User)
+class Record(models.Model):
+    startedBy       = models.CharField (max_length=200)
     isActive        = models.BooleanField (default=False)
     isCompleted     = models.BooleanField (default=False)

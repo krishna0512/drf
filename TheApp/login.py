@@ -90,9 +90,13 @@ class Login(QtGui.QMainWindow,form_class):
                 self.sessionid = r.cookies['sessionid']
                 # self is passed in the chat to gain the access to
                 # self.sessionid variable..
-                self.chat = Chat(self)
-                self.chat.show()
-                self.hide()
+#               self.chat = Chat(self)
+#               self.chat.show()
+#               self.hide()
+                print "ksjdf"
+                url = 'http://localhost:8000/polls/GetLoggedinUsers/'
+                r = requests.get (url)
+                print str(r.text)
 
     def openRegisteration(self):
         self.reg = Register()
