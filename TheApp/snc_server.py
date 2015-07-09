@@ -4,6 +4,7 @@ import vlc
 import pycurl
 import json
 import requests
+from dialog import Dialog
 from StringIO import StringIO
 from PyQt4 import QtGui, QtCore, uic
 
@@ -81,7 +82,9 @@ class PostQues(QtGui.QWidget):
                 currectAns.append(True)
             else:
                 currectAns.append(False)
-        if not currectAns or not options:
+        if not question or options[0] == '':
+            self.dlg = Dialog("Field missing")
+            self.dlg.show()
             
         else:
             url = 'http://localhost:8000/polls/PostQues/'
@@ -121,13 +124,14 @@ class Player(QtGui.QMainWindow,form_class):
         self.timeslider.sliderMoved.connect(self.setPosition)
         self.playbutton.clicked.connect(self.playPause)
         self.stopbutton.clicked.connect(self.stop)
-        self.postbutton.clicked.connect(self.postQues)
         self.playbutton.setIcon(QtGui.QIcon('playButton.png'))
         self.playbutton.setIconSize(QtCore.QSize(24,24))
         self.stopbutton.setIcon(QtGui.QIcon('stopButton.png'))
         self.stopbutton.setIconSize(QtCore.QSize(24,24))
         self.volumeslider.setValue(self.mediaplayer.audio_get_volume())
         self.volumeslider.valueChanged.connect(self.setVolume)
+        self.menuOpen.triggered.connect(self.openFile)
+        self.menuPost.triggered.connect(self.postQues)
         self.menuExit.triggered.connect(sys.exit)
 
         self.synVideo.toggle()
@@ -137,10 +141,47 @@ class Player(QtGui.QMainWindow,form_class):
         self.payload['isPaused'] = False
         self.payload['hasQues'] = False
         self.payload['synVideo'] = True
+        self.payload['isStopped'] = False
 
         if self.mediaplayer.play() == -1:
             self.playbutton.setText("Open")
 
+    def keyPressEvent (self, event):
+        key = event.key()
+        if key == QtCore.Qt.Key_Space:
+            self.playbutton.animateClick()
+        if key == QtCore.Qt.Key_Up:
+            volume = int(self.mediaplayer.audio_get_volue())
+            setVolume(volume+5)
+        if key == QtCore.Qt.Key_Down:
+            volume = int(self.mediaplayer.audio_get_volue())
+            setVolume(volume-5)
+        if key == QtCore.Qt.Key_Left:
+            if self.sync == True:
+                position = int(self.mediaplayer.get_position()*1000)
+                setPosition(position + 1000)
+        if key == QtCore.Qt.Key_Right:
+            if self.sync == True:
+                position = int(self.mediaplayer.get_position()*1000)
+                if position > 1000:
+                    setPosition(position - 1000)
+    
+    def closeEvent(self, event):
+        reply = QtGui.QMessageBox.question(self, 'Message',
+            "Are you sure to quit?", QtGui.QMessageBox.Yes | 
+            QtGui.QMessageBox.No, QtGui.QMessageBox.No)
+
+        if reply == QtGui.QMessageBox.Yes:
+            self.payload['synVideo'] = False
+            data = json.dumps(self.payload)
+            data = {'data':data}
+            url = 'http://localhost:8000/polls/PostCurSet/'
+            r = requests.get(url,params = data)
+            print 'about to exit'
+            event.accept()
+        else:
+            event.ignore() 
+        
     def setPosition (self, position):
         self.mediaplayer.set_position(position/1000.0)
 
@@ -196,6 +237,7 @@ class Player(QtGui.QMainWindow,form_class):
         """
         self.mediaplayer.stop()
         self.playbutton.setText("Play")
+        self.payload['isStopped'] = True
 
 
     def setVolume(self, Volume):
@@ -268,9 +310,7 @@ class Player(QtGui.QMainWindow,form_class):
             self.payload['synVideo'] = True
         else :
             self.payload['synVideo'] = False
-#       url = 'http://localhost:8000/polls/SetTime/'
         self.payload['currentPosition']=int(self.mediaplayer.get_position()*10000)
-#       r=requests.get(url,params=payload)
         data = json.dumps(self.payload)
         data = {'data':data}
         url = 'http://localhost:8000/polls/PostCurSet/'

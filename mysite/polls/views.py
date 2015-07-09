@@ -14,25 +14,11 @@ isPlay = False
 videoTime = 0
 haveQues = False
 synVideo = True
+isStopped = False
 
 def index (request):
     return HttpResponse("you reached index")
 
-#def Play (request):
-#    global isPlay 
-#    isPlay = True
-#    return HttpResponse(isPlay)
-#
-#def Pause (request):
-#    global isPlay
-#    isPlay = False
-#    return HttpResponse(isPlay)
-#
-#def SetTime (request):   
-#    global videoTime
-#    videoTime = request.GET['currentposition']
-#    return HttpResponse(videoTime)
-#
 def PostQues (request):   
     global haveQues
     question = str( request.GET['ques'] )
@@ -68,7 +54,7 @@ def SubAns (request):
         return HttpResponse(False)  #incorrect response
 
 def GetCurSet (request):
-    global videoTime, isPlay, haveQues, synVideo
+    global videoTime, isPlay, haveQues, synVideo, isStopped
 
     options = []
     if haveQues == False:
@@ -76,7 +62,8 @@ def GetCurSet (request):
             'curTime':videoTime,
             'isPlaying':isPlay,
             'haveQues':haveQues,
-            'synVideo':synVideo
+            'synVideo':synVideo,
+            'isStopped':isStopped
         }
     else:
         q = Question.objects.order_by('-id')[0]
@@ -97,12 +84,13 @@ def GetCurSet (request):
     return HttpResponse(data2)
 
 def PostCurSet (request):
-    global videoTime, isPlay, haveQues, synVideo
+    global videoTime, isPlay, synVideo, isStopped
     data = str(request.GET['data'])
     data = json.loads(data)
     videoTime = data['currentPosition']
     synVideo = data['synVideo']
     isPlay = not data['isPaused']
+    isStopped = data['isStopped']
 #   haveQues = data['hasQues']
 #   if haveQues:
 #       question = str( data['ques'] )

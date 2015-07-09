@@ -3,6 +3,7 @@ import vlc
 import pycurl
 import requests
 import json
+from dialog import Dialog
 from random import randint
 from StringIO import StringIO
 from PyQt4 import QtGui, QtCore, uic
@@ -78,7 +79,7 @@ class Player(QtGui.QMainWindow,form_class):
 
         # Connection setups
         self.timer.timeout.connect(self.updateUI)
-        self.timeslider.sliderMoved.connect(self.setPosition)
+        self.timeslider.valueChanged.connect(self.setPosition)
         self.playbutton.clicked.connect(self.asynPlay)
         self.stopbutton.clicked.connect(self.stop)
         self.playbutton.setIcon(QtGui.QIcon('playButton.png'))
@@ -94,6 +95,7 @@ class Player(QtGui.QMainWindow,form_class):
         self.data = {}
         self.isPlaying = False
         self.isPaused = False
+        self.isStopped = False
         self.haveQues = False
         self.sync = False
         self.Play = True
@@ -146,6 +148,26 @@ class Player(QtGui.QMainWindow,form_class):
         self.playPause()
 
 
+    def keyPressEvent (self, event):
+        key = event.key()
+        if key == QtCore.Qt.Key_Space:
+            self.playbutton.animateClick()
+        if key == QtCore.Qt.Key_Up:
+            volume = int(self.mediaplayer.audio_get_volue())
+            setVolume(volume+5)
+        if key == QtCore.Qt.Key_Down:
+            volume = int(self.mediaplayer.audio_get_volue())
+            setVolume(volume-5)
+        if key == QtCore.Qt.Key_Left:
+            if self.sync == True:
+                position = int(self.mediaplayer.get_position()*1000)
+                setPosition(position + 1000)
+        if key == QtCore.Qt.Key_Right:
+            if self.sync == True:
+                position = int(self.mediaplayer.get_position()*1000)
+                if position > 1000:
+                    setPosition(position - 1000)
+    
     def stop(self):
         """Stop player
         """
@@ -213,14 +235,17 @@ class Player(QtGui.QMainWindow,form_class):
         self.data = json.loads(r.text)
         self.sync = self.data ['synVideo']
         self.isPlaying = self.data['isPlaying']
+        self.isStopped = self.data['isStopped']
+        self.curPosition = self.data['curTime']
+        self.haveQues = self.data['haveQues']
+
         if self.sync:
             self.Play = self.isPlaying
             self.isPaused = not self.isPlaying
             self.updatePosition()
+            if self.isStopped:
+                self.stop()
         
-        self.curPosition = self.data['curTime']
-        self.haveQues = self.data['haveQues']
-
         if self.haveQues:
             # self.isPlaying = False
             self.question = self.data['question']
@@ -229,7 +254,7 @@ class Player(QtGui.QMainWindow,form_class):
             self.popup.show()
 
 
-         self.timeslider.setValue(self.mediaplayer.get_position() * 1000)
+        self.timeslider.setValue(self.mediaplayer.get_position() * 1000)
         #displaying the current time of the video
         curTime=self.mediaplayer.get_time()/1000
         if not curTime>=0:
@@ -267,7 +292,7 @@ class Player(QtGui.QMainWindow,form_class):
                 fullTime = minute + ':' + sec 
         self.fulltime.setText(fullTime)
 
-        if (self.isPlaying != self.previousStatus or self.sync != self.lastState) and self.sync :
+        if (self.isPlaying != self.previousStatus or self.sync != self.lastState) and self.sync:
             self.playPause()
 
         self.previousStatus = self.isPlaying

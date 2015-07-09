@@ -4,9 +4,6 @@ from views import *
 
 urlpatterns = [
     url(r'^$', index, name='index'),
-#   url(r'^Play/$', Play, name='Play'),
-#   url(r'^Pause/$', Pause, name='Pause'),
-#   url(r'^SetTime/', SetTime, name='SetTime'),
     url(r'^GetCurSet/', GetCurSet, name='GetCurSet'),
     url(r'^PostCurSet/', PostCurSet, name='PostCurSet'),
     url(r'^PostQues/', PostQues, name='PostQues'),

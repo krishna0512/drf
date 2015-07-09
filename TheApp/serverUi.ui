@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>645</width>
-    <height>631</height>
+    <height>600</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -118,6 +118,9 @@
     <property name="maximum">
      <number>1000</number>
     </property>
+    <property name="value">
+     <number>1</number>
+    </property>
     <property name="orientation">
      <enum>Qt::Horizontal</enum>
     </property>
@@ -126,7 +129,7 @@
     <property name="geometry">
      <rect>
       <x>10</x>
-      <y>550</y>
+      <y>520</y>
       <width>98</width>
       <height>27</height>
      </rect>
@@ -139,7 +142,7 @@
     <property name="geometry">
      <rect>
       <x>110</x>
-      <y>550</y>
+      <y>520</y>
       <width>98</width>
       <height>27</height>
      </rect>
@@ -152,7 +155,7 @@
     <property name="geometry">
      <rect>
       <x>470</x>
-      <y>550</y>
+      <y>520</y>
       <width>151</width>
       <height>29</height>
      </rect>
@@ -214,24 +217,11 @@
      <string>0</string>
     </property>
    </widget>
-   <widget class="QPushButton" name="postbutton">
-    <property name="geometry">
-     <rect>
-      <x>10</x>
-      <y>510</y>
-      <width>101</width>
-      <height>27</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>Post Question</string>
-    </property>
-   </widget>
    <widget class="QCheckBox" name="synVideo">
     <property name="geometry">
      <rect>
-      <x>130</x>
-      <y>513</y>
+      <x>240</x>
+      <y>520</y>
       <width>97</width>
       <height>22</height>
      </rect>
@@ -255,6 +245,7 @@
      <string>File</string>
     </property>
     <addaction name="menuOpen"/>
+    <addaction name="menuPost"/>
     <addaction name="menuExit"/>
    </widget>
    <widget class="QMenu" name="menuHelp">
@@ -282,7 +273,19 @@
     <string>About</string>
    </property>
   </action>
+  <action name="menuPost">
+   <property name="text">
+    <string>Post Question</string>
+   </property>
+  </action>
  </widget>
+ <tabstops>
+  <tabstop>playbutton</tabstop>
+  <tabstop>timeslider</tabstop>
+  <tabstop>volumeslider</tabstop>
+  <tabstop>synVideo</tabstop>
+  <tabstop>stopbutton</tabstop>
+ </tabstops>
  <resources/>
  <connections/>
 </ui>
