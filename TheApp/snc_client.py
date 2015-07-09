@@ -1,4 +1,5 @@
 import sys
+import os
 import vlc
 import pycurl
 import requests

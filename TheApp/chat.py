@@ -32,13 +32,14 @@ class Chat(QtGui.QMainWindow,form_class):
         #self.isChat.toggle()
 
         # This variable is derived from Login class of temp
-        self.sessionid = str(master.sessionid)
+        self.username = 'romil'
+        #self.sessionid = str(master.sessionid)
 
-        cookies = {'sessionid':self.sessionid}
-        url = 'http://localhost:8000/polls/GetUserDetail'
-        r=requests.get(url, cookies=cookies)
-        self.username = str(r.text).split()[0]
-        self.textBrowser.setText(r.text)
+        #cookies = {'sessionid':self.sessionid}
+        #url = 'http://localhost:8000/polls/GetUserDetail'
+        #r=requests.get(url, cookies=cookies)
+        #self.username = str(r.text).split()[0]
+        #self.textBrowser.setText(r.text)
 
         self.timer.start()
 
@@ -61,7 +62,7 @@ class Chat(QtGui.QMainWindow,form_class):
             elif self.isAns.isChecked():
                 payload['isQues'] = False
                 payload['isAns' ] = True
-                payload[ 'tag'  ] = str(self.tagArea.toPlainText()).strip()
+                payload[ 'tag'  ] = str(self.tagArea.text()).strip()
             else:
                 payload['isQues'] = False
                 payload['isAns' ] = False
