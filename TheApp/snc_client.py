@@ -4,10 +4,10 @@ import vlc
 import pycurl
 import requests
 import json
-from dialog import Dialog
-from random import randint
-from StringIO import StringIO
-from PyQt4 import QtGui, QtCore, uic
+from   dialog     import Dialog
+from   random     import randint
+from   StringIO   import StringIO
+from   PyQt4      import QtGui, QtCore, uic
 
 form_class = uic.loadUiType("clientUi.ui")[0]
 
@@ -80,7 +80,7 @@ class Player(QtGui.QMainWindow,form_class):
 
         # Connection setups
         self.timer.timeout.connect(self.updateUI)
-        self.timeslider.valueChanged.connect(self.setPosition)
+        self.timeslider.sliderMoved.connect(self.setPosition)
         self.playbutton.clicked.connect(self.asynPlay)
         self.stopbutton.clicked.connect(self.stop)
         self.playbutton.setIcon(QtGui.QIcon('playButton.png'))
@@ -116,6 +116,8 @@ class Player(QtGui.QMainWindow,form_class):
         """Open a media file in a MediaPlayer
         """
         print 'in openfile'
+        if filename == False:
+            filename = None
         if filename is None:
             filename = QtGui.QFileDialog.getOpenFileName(self, "Open File", os.path.expanduser('~'))
         if not filename:
@@ -153,21 +155,21 @@ class Player(QtGui.QMainWindow,form_class):
         key = event.key()
         if key == QtCore.Qt.Key_Space:
             self.playbutton.animateClick()
-        if key == QtCore.Qt.Key_Up:
-            volume = int(self.mediaplayer.audio_get_volue())
-            setVolume(volume+5)
-        if key == QtCore.Qt.Key_Down:
-            volume = int(self.mediaplayer.audio_get_volue())
-            setVolume(volume-5)
-        if key == QtCore.Qt.Key_Left:
-            if self.sync == True:
-                position = int(self.mediaplayer.get_position()*1000)
-                setPosition(position + 1000)
-        if key == QtCore.Qt.Key_Right:
-            if self.sync == True:
-                position = int(self.mediaplayer.get_position()*1000)
-                if position > 1000:
-                    setPosition(position - 1000)
+#       if key == QtCore.Qt.Key_Up:
+#           volume = int(self.mediaplayer.audio_get_volue())
+#           setVolume(volume+5)
+#       if key == QtCore.Qt.Key_Down:
+#           volume = int(self.mediaplayer.audio_get_volue())
+#           setVolume(volume-5)
+#       if key == QtCore.Qt.Key_Left:
+#           if self.sync == True:
+#               position = int(self.mediaplayer.get_position()*1000)
+#               setPosition(position + 1000)
+#       if key == QtCore.Qt.Key_Right:
+#           if self.sync == True:
+#               position = int(self.mediaplayer.get_position()*1000)
+#               if position > 1000:
+#                   setPosition(position - 1000)
     
     def stop(self):
         """Stop player
@@ -233,12 +235,12 @@ class Player(QtGui.QMainWindow,form_class):
         # setting the slider to the desired position
         url = 'http://localhost:8000/polls/GetCurSet/'
         r=requests.get(url)
-        self.data = json.loads(r.text)
-        self.sync = self.data ['synVideo']
-        self.isPlaying = self.data['isPlaying']
-        self.isStopped = self.data['isStopped']
-        self.curPosition = self.data['curTime']
-        self.haveQues = self.data['haveQues']
+        self.data        = json.loads(r.text)
+        self.sync        = self.data['synVideo' ]
+        self.isPlaying   = self.data['isPlaying']
+        self.isStopped   = self.data['isStopped']
+        self.curPosition = self.data['curTime'  ]
+        self.haveQues    = self.data['haveQues' ]
 
         if self.sync:
             self.Play = self.isPlaying
@@ -250,7 +252,7 @@ class Player(QtGui.QMainWindow,form_class):
         if self.haveQues:
             # self.isPlaying = False
             self.question = self.data['question']
-            self.options = self.data['options']
+            self.options  = self.data['options' ]
             self.popup = PopupQues(self)
             self.popup.show()
 

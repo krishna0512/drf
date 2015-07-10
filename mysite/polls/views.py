@@ -92,27 +92,8 @@ def PostCurSet (request):
     synVideo = data['synVideo']
     isPlay = not data['isPaused']
     isStopped = data['isStopped']
-#   haveQues = data['hasQues']
-#   if haveQues:
-#       question = str( data['ques'] )
-#       options  = data['options']
-#       curAns   = data['currectAnswer']
-#   
-#       q = Question(question_text = question, pub_date = timezone.now())
-#       q.save()
-#   
-#       i=0
-#       for option in options:
-#           if curAns[i]:
-#               q.choice_set.create(choice_text = str(option), isCurrect=True)
-#           else:
-#               q.choice_set.create(choice_text = str(option), isCurrect=False)
-#           i+=1
-#   
-#       haveQues = True
     return HttpResponse('All is well') 
    
-
 def PostInsertQuery (request):
     data = str(request.GET['data'])     # retrieving the data form the GET dictionary
     data = json.loads(data)
@@ -145,19 +126,12 @@ def GetInsertQuery (request):
     # state can be either threaded or timed..
     state = str (request.GET['state'])
 
-    #lastpostid = 0
-    #lastcommentid = 0
-    # This is the temporary timestamp view
-
     if state == 'Threaded':
         for i in Post.objects.all():
             if i.isQues == True:
                 s += 'Q' + str(i.id) + ' ' + str(i.fromUser) + ':\n' + str(i.message) + '\n'
                 for j in i.comment_set.all():
                     s += 'A' + str(i.id) + ' ' + str(j.fromUser) + ':\n' + str(j.message) + '\n'
-            #else:
-                #if state == 'Timed':
-                    #s += str(i.fromUser) + ':\n' + str(i.message) + '\n'
     elif state == 'Timed':
         a = []
         for i in Post.objects.all():
@@ -187,8 +161,6 @@ def GetInsertQuery (request):
                 s += 'A' + str(i['id']) + ' ' + str(i['fromUser']) + ':\n' + str(i['message']) + '\n'
             else:
                 s += str(i['fromUser']) + ':\n' + str(i['message']) + '\n'
-
-
     return HttpResponse(str(s).strip())
 
 def Register (request):
@@ -214,11 +186,15 @@ def Register (request):
 
 def Login (request):
     username = str(request.GET['username'])
-    password = str(request.GET['pass'])
+    password = str(request.GET['pass'    ])
     user = authenticate (username=username, password=password)
     if user is not None:
         login (request, user)
-        data = {'uname':username}
+        TA = Group.objects.filter(name='TA')[0]
+        if user in TA.user_set.all():
+            data = {'uname':username,'isTA':True}
+        else:
+            data = {'uname':username,'isTA':False}
         data2 = json.dumps(data)
         return HttpResponse(data2)
     else:
@@ -242,15 +218,18 @@ def GetLoggedinUsers (request):
     uid = []
     for i in s:
         uid.append(i.get_decoded().get('_auth_user_id', None))
-    a = User.objects.filter(id__in=uid)
-    s = [i.username for i in a]
-    return HttpResponse (json.dumps(s))
+    a = Group.objects.filter(name='TA')[0].user_set.all().filter(id__in=uid)
+    b = Group.objects.filter(name='Student')[0].user_set.all().filter(id__in=uid)
+    t = [i.username for i in a]
+    s = [i.username for i in b]
+    ret = {'ta':t, 'student':s}
+    return HttpResponse (json.dumps(ret))
 
 def GetAllUsers (request):
-    ta      = Group.objects.filter(name='TA')[0]
-    student = Group.objects.filter(name='Student')[0]
-    t = [i.username for i in ta.user_set.all()]
-    s = [i.username for i in student.user_set.all()]
+    TA      = Group.objects.filter(name='TA')[0]
+    Student = Group.objects.filter(name='Student')[0]
+    t = [ta.username for ta in TA.user_set.all()]
+    s = [st.username for st in Student.user_set.all()]
     ret = {'ta':t, 'student':s}
     return HttpResponse (json.dumps(ret))
 

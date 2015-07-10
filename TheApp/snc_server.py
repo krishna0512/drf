@@ -16,7 +16,7 @@ class PostQues(QtGui.QWidget):
     '''    
     def __init__(self,master=None):
         QtGui.QWidget.__init__(self, master)
-        self.setWindowTitle('QtGui.QCheckBox')
+        self.setWindowTitle('Post Question')
         
         self.i=0
         self.option = []

@@ -3,10 +3,13 @@ import os.path
 import time
 import requests
 import json
-from dialog import Dialog
-from chat import *
-from StringIO import StringIO
-from PyQt4 import QtGui, QtCore, uic
+from   dialog       import Dialog
+from   chat         import *
+from   taview       import *
+import snc_server
+import snc_client 
+from   StringIO     import StringIO
+from   PyQt4        import QtGui, QtCore, uic
 
 form_class = uic.loadUiType("login.ui")[0]
 form2_class = uic.loadUiType("register.ui")[0]
@@ -88,15 +91,21 @@ class Login(QtGui.QMainWindow,form_class):
             else:
                 # Login Successfull
                 self.sessionid = r.cookies['sessionid']
+                data = json.loads(r.text)
+                isTA = data['isTA']
+                if isTA:
+                    self.dpl = TaView()
+                    self.dpl.show()
+                    self.snc = snc_server.Player()
+                    self.snc.show()
+                else:
+                    self.snc = snc_client.Player()
+                    self.snc.show()
                 # self is passed in the chat to gain the access to
                 # self.sessionid variable..
-#               self.chat = Chat(self)
-#               self.chat.show()
-#               self.hide()
-                print "ksjdf"
-                url = 'http://localhost:8000/polls/GetLoggedinUsers/'
-                r = requests.get (url)
-                print str(r.text)
+                self.chat = Chat(self)
+                self.chat.show()
+                self.hide()
 
     def openRegisteration(self):
         self.reg = Register()
