@@ -77,6 +77,7 @@ def GetCurSet (request):
             'isPlaying':isPlay,
             'haveQues':haveQues,
             'synVideo':synVideo,
+            'isStopped':isStopped,
             'question':ques_text,
             'options':options
         }
@@ -122,46 +123,67 @@ def PostInsertQuery (request):
 
 def GetInsertQuery (request):
     s = ''
-    data = str (request.GET['data'])
     # state can be either threaded or timed..
     state = str (request.GET['state'])
 
     if state == 'Threaded':
+        a = []
         for i in Post.objects.all():
             if i.isQues == True:
-                s += 'Q' + str(i.id) + ' ' + str(i.fromUser) + ':\n' + str(i.message) + '\n'
+                b = {}
+                b['id'       ] = str(i.id)
+                b['message'  ] = str(i.message)
+                b['fromUser' ] = str(i.fromUser)
+                b['timestamp'] = str(i.timestamp)
+                b['isQues'   ] = True
+                b['isAns'    ] = False
+                b['hasAns'   ] = False
+                b['ans'      ] = []
+#               s += 'Q' + str(i.id) + ' ' + str(i.fromUser) + ':\n' + str(i.message) + '\n'
                 for j in i.comment_set.all():
-                    s += 'A' + str(i.id) + ' ' + str(j.fromUser) + ':\n' + str(j.message) + '\n'
+                    c={}
+                    b['hasAns'   ] = True
+                    c['id'       ] = str(j.post.id)
+                    c['message'  ] = str(j.message)
+                    c['timestamp'] = str(j.timestamp)
+                    c['fromUser' ] = str(j.fromUser)
+                    c['isQues'   ] = False
+                    c['isAns'    ] = True
+                    b['ans'      ].append(c)
+                a.append(b)
+#                   s += 'A' + str(i.id) + ' ' + str(j.fromUser) + ':\n' + str(j.message) + '\n'
     elif state == 'Timed':
         a = []
         for i in Post.objects.all():
             b = {}
-            b['id'] = i.id
-            b['message'] = i.message
-            b['fromUser'] = i.fromUser
-            b['timestamp'] = i.timestamp
-            b['isQues'] = i.isQues
+            b['id'       ] = i.id
+            b['message'  ] = i.message
+            b['fromUser' ] = i.fromUser
+            b['timestamp'] = str(i.timestamp)
+            b['isQues'   ] = i.isQues
+            b['isAns'    ] = False
             a.append(b)
         for i in Comment.objects.all():
             b={}
-            b['id'] = i.post.id
-            b['message'] = i.message
-            b['timestamp'] = i.timestamp
-            b['fromUser'] = i.fromUser
-            b['isQues'] = False
-            b['isAns'] = True
+            b['id'       ] = i.post.id
+            b['message'  ] = i.message
+            b['timestamp'] = str(i.timestamp)
+            b['fromUser' ] = i.fromUser
+            b['isQues'   ] = False
+            b['isAns'    ] = True
             a.append(b)
         # Sort the combined list using the key 'timestamp'
-        sortedList = sorted (a, key=itemgetter('timestamp'))
-        s = ''
-        for i in sortedList:
-            if i['isQues'] == True:
-                s += 'Q' + str(i['id']) + ' ' + str(i['fromUser']) + ':\n' + str(i['message']) + '\n'
-            elif i['isQues'] is False and i.has_key('isAns') and i['isAns'] is True:
-                s += 'A' + str(i['id']) + ' ' + str(i['fromUser']) + ':\n' + str(i['message']) + '\n'
-            else:
-                s += str(i['fromUser']) + ':\n' + str(i['message']) + '\n'
-    return HttpResponse(str(s).strip())
+        a = sorted (a, key=itemgetter('timestamp'))
+#       s = ''
+#       for i in sortedList:
+#           if i['isQues'] == True:
+#               s += 'Q' + str(i['id']) + ' ' + str(i['fromUser']) + ':\n' + str(i['message']) + '\n'
+#           elif i['isQues'] is False and i.has_key('isAns') and i['isAns'] is True:
+#               s += 'A' + str(i['id']) + ' ' + str(i['fromUser']) + ':\n' + str(i['message']) + '\n'
+#           else:
+#               s += str(i['fromUser']) + ':\n' + str(i['message']) + '\n'
+    data = json.dumps(a)
+    return HttpResponse(data)
 
 def Register (request):
     # Duplicate Users Integrity Error can be checked using status_code of r

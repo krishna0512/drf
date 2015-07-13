@@ -39,7 +39,7 @@ class CustomSlider(QtGui.QWidget):
         self.layout = QtGui.QStackedLayout()
         self.layout.setStackingMode(QtGui.QStackedLayout.StackAll)
         self.layout.addWidget(self.slider)
-        self.layout.addWidget(self.overlay)
+        self.layout.addWidget(self.overlay) 
 
         self.setLayout(self.layout)
 

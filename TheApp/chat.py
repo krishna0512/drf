@@ -23,23 +23,24 @@ class Chat(QtGui.QMainWindow,form_class):
         self.menuThreaded.triggered.connect(self.changeViewToThreaded)
         self.menuExit.triggered.connect(sys.exit)
         self.currentView = 'Timed'
+        self.testBrowser.setVisible(False)
         self.isViewChanged = False
 
         self.timer = QtCore.QTimer(self)
-        self.timer.setInterval(500)
+        self.timer.setInterval(1000)
         self.timer.timeout.connect (self.updateMessage)
 
-        #self.isChat.toggle()
+        self.isChat.toggle()
 
         # This variable is derived from Login class of temp
-        self.username = 'romil'
-        #self.sessionid = str(master.sessionid)
+        
+        self.sessionid = str(master.sessionid)
 
-        #cookies = {'sessionid':self.sessionid}
-        #url = 'http://localhost:8000/polls/GetUserDetail'
-        #r=requests.get(url, cookies=cookies)
-        #self.username = str(r.text).split()[0]
-        #self.textBrowser.setText(r.text)
+        cookies = {'sessionid':self.sessionid}
+        url = 'http://localhost:8000/polls/GetUserDetail'
+        r=requests.get(url, cookies=cookies)
+        self.username = str(r.text).split()[0]
+        self.textBrowser.setText(r.text)
 
         self.timer.start()
 
@@ -71,13 +72,15 @@ class Chat(QtGui.QMainWindow,form_class):
             r = requests.get(url,params = data)
             # Checks if the request is processed correctly by the server
             if int(r.status_code) == 500:
-                d = Dialog ('Invalid Tag Number! Please Try Again..',self)
+                d = Dialog ('Invalid! Please Try Again..',self)
                 d.show()
                 self.tagArea.clear()
             else:
                 self.textArea.setText('')
+                self.tagArea.clear()
+                self.isChat.setChecked(True)
             # updates the messages retrived from the server
-            self.updateMessage()
+            #self.updateMessage()
 
     def changeViewToTimed (self):
         self.menuThreaded.setChecked (False)
@@ -91,18 +94,69 @@ class Chat(QtGui.QMainWindow,form_class):
         self.isViewChanged = True
         pass
 
+    def on_anchor_clicked(self,url):
+        text = str(url.toString())
+        print text
+        if text.startswith('id_://'):
+            self.textBrowser.setSource(QtCore.QUrl()) #stops the page from changing
+            function = text.replace('id_://','')
+            temp = function.split('_',1)
+            print temp[0]+'asdaszf '+temp[1]
+            if hasattr(self,temp[1]):
+                getattr(self,temp[1])(temp[0])
+
+    def a_function(self,no):
+        print 'you called?'
+        self.tagArea.setText(str(no))
+        self.isAns.setChecked(True)
+        print 'im leaving >.<'
    
     def updateMessage(self):
         url = 'http://localhost:8000/polls/GetInsertQuery/'
-        original =  str(self.textBrowser.toPlainText()).strip()
+        payload = {'state' : self.currentView}
+        r = requests.get(url, params=payload)
+        m = json.loads(r.text)
+        original =  str(self.textBrowser.toHtml()).strip()
         # state can be threaded for threaded view or timed for timestamp view
         # give state = timed for timestamp view and any other value for threaded view
-        payload = {'data' : str(original[-50:]), 'state' : self.currentView}
-        message = str(requests.get(url, params=payload).text).strip()
+        message = '''<html>
+            <head><style type=text/css>
+            a:active {color:red; text-decoration:none;}
+            a:hover {color:blue; text-decoration:underline}
+            </style></head><body>'''
+        if self.currentView == 'Threaded':
+            for i in m:
+                if i['isQues'] == True:
+                    message += '<a href="id_://' + str(i['id']) + '_a_function">'
+                    message += '<h4>Q' + str(i['id']) + '</h4> ' + str(i['fromUser']) + ':</a><br />'
+                    message += str(i['message']).replace('\n','<br />') + '<br />'  
+                    if i['hasAns'] == True:
+                        ans = i['ans']
+                        for j in ans:
+                            message += '<h5>A' + str(j['id']) + '</h5>' + str(j['fromUser']) + ':<br />'
+                            message += str(j['message']).replace('\n','<br />') +'<br />'
+        else: 
+            for i in m:
+                if i['isQues'] == True:
+                    message += '<a href="id_://' + str(i['id']) + '_a_function">'
+                    message += '<h4>Q' + str(i['id']) + '</h4> ' + str(i['fromUser']) + ':</a><br />' 
+                    message += str(i['message']).replace('\n','<br />') + '<br />'
+                elif i['isQues'] is False and i['isAns'] is True:
+                    message += '<h5>A' + str(i['id']) + '</h5> ' + str(i['fromUser']) + ':<br />'
+                    message += str(i['message']).replace('\n','<br />') + '<br />'
+                else:
+                    message += str(i['fromUser']) + ':<br />'
+                    message += str(i['message']).replace('\n','<br />') + '<br />'
+        message += '<br />'
+        message += '</body></html>'
+        self.textBrowser.anchorClicked.connect(self.on_anchor_clicked)
         # This is checking and updating the messages only when there is a change
-        if original != message or self.isViewChanged is True:
+        # testBrowser is dummy textBrower added in UI to match the newMessage so that scrolling can be effective
+        self.testBrowser.setHtml(message)
+        newMessage = str(self.testBrowser.toHtml()).strip()
+        if str(original).strip() != str(newMessage).strip() or self.isViewChanged is True:
             self.isViewChanged = False
-    	    self.textBrowser.setText(message)
+    	    self.textBrowser.setHtml(message)
             # Moves the scroll to the bottom
             self.textBrowser.moveCursor(QtGui.QTextCursor.End)
 

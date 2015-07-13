@@ -93,14 +93,14 @@ class Login(QtGui.QMainWindow,form_class):
                 self.sessionid = r.cookies['sessionid']
                 data = json.loads(r.text)
                 isTA = data['isTA']
-                if isTA:
-                    self.dpl = TaView()
-                    self.dpl.show()
-                    self.snc = snc_server.Player()
-                    self.snc.show()
-                else:
-                    self.snc = snc_client.Player()
-                    self.snc.show()
+#               if isTA:
+#                   self.dpl = TaView()
+#                   self.dpl.show()
+#                   self.snc = snc_server.Player()
+#                   self.snc.show()
+#               else:
+#                   self.snc = snc_client.Player()
+#                   self.snc.show()
                 # self is passed in the chat to gain the access to
                 # self.sessionid variable..
                 self.chat = Chat(self)
