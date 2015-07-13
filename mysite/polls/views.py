@@ -121,6 +121,36 @@ def PostInsertQuery (request):
     q.save()
     return HttpResponse(name)
 
+def Search(request):
+    tag = int(request.GET['id'])
+    post = Post.objects.filter(id = tag)[0]
+    if post.isQues == True:
+        b = {}
+        b['id'       ] = str(post.id)
+        b['message'  ] = str(post.message)
+        b['fromUser' ] = str(post.fromUser)
+        b['timestamp'] = str(post.timestamp)
+        b['isQues'   ] = True
+        b['isAns'    ] = False
+        b['hasAns'   ] = False
+        a = []
+        for j in post.comment_set.all():
+            c={}
+            b['hasAns'   ] = True
+            c['id'       ] = str(j.post.id)
+            c['message'  ] = str(j.message)
+            c['timestamp'] = str(j.timestamp)
+            c['fromUser' ] = str(j.fromUser)
+            c['isQues'   ] = False
+            c['isAns'    ] = True
+            a.append(c)
+        data = {'ques':b,'answer':a}
+    else :
+        data = {'ques':{},'answer':[]}
+    data = json.dumps(data)
+    return HttpResponse(data)
+
+
 def GetInsertQuery (request):
     s = ''
     # state can be either threaded or timed..

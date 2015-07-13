@@ -22,6 +22,7 @@ class Chat(QtGui.QMainWindow,form_class):
         self.menuTimed.triggered.connect(self.changeViewToTimed)
         self.menuThreaded.triggered.connect(self.changeViewToThreaded)
         self.menuExit.triggered.connect(sys.exit)
+        self.searchArea.returnPressed.connect(self.search)
         self.currentView = 'Timed'
         self.testBrowser.setVisible(False)
         self.isViewChanged = False
@@ -159,6 +160,59 @@ class Chat(QtGui.QMainWindow,form_class):
     	    self.textBrowser.setHtml(message)
             # Moves the scroll to the bottom
             self.textBrowser.moveCursor(QtGui.QTextCursor.End)
+        
+    def search(self):
+        if not self.is_number(self.searchArea.text()):
+            d = Dialog ('Invalid! Please Try Again..',self)
+            d.show()
+            self.searchArea.clear()
+        else :
+            url = 'http://localhost:8000/polls/Search/'
+            payload = {'id' : int(self.searchArea.text())}
+            r = requests.get(url, params=payload)
+            m = json.loads(r.text)
+            if int(r.status_code) == 500:
+                d = Dialog ('Invalid! Please Try Again..',self)
+                d.show()
+                self.searchArea.clear()
+            else:
+                data = json.loads(r.text)
+                if data['ques'] == {}:
+                    d = Dialog ('Not a question! Please Try Again..',self)
+                    d.show()
+                    self.searchArea.clear()
+                else:
+                    message = 'Q '+ str(data['ques']['message'])
+                    message += '\n'
+                    if data['ques']['hasAns']:
+                        ans = data['answer']
+                        j = 1
+                        for i in ans:
+                            message +='A'+str(j)+' '+ i['message']+'\n'
+                            j += 1
+                    d = Dialog (message,self)
+                    d.show()
+                    self.searchArea.clear()
+                
+    def is_number(self,s):
+        try:
+            int(s)
+            return True
+        except ValueError:
+            return False
+        
+    def closeEvent(self, event):
+        reply = QtGui.QMessageBox.question(self, 'Message',
+            "Are you sure to quit?", QtGui.QMessageBox.Yes | 
+            QtGui.QMessageBox.No, QtGui.QMessageBox.No)
+
+        if reply == QtGui.QMessageBox.Yes:
+            url = 'http://localhost:8000/polls/Logout/'
+            r = requests.get(url)
+            event.accept()
+        else:
+            event.ignore() 
+
 
 
 if __name__ == "__main__":

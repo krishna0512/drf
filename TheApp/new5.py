@@ -7,18 +7,16 @@ class MainWindow(QtGui.QWidget):
     def __init__(self):
         super(MainWindow, self).__init__()
         main_layout = QtGui.QVBoxLayout()
-        a='krishna'
-
         self.browser = QtGui.QTextBrowser()
         self.browser.setHtml('''<html>
             <head><style type=text/css>
-            a:link {color:red; text-decoration:none;}
+            a:link {color:green; text-decoration:none;}
             a:hover {color:blue; text-decoration:underline}
             </style></head>
             <body>some text<br>
             <a href="a23://a_function">click me to call a function</a>
             <br>
-            <a href="#my_anchor">'''+' tulsyan' + ''' Click me to scroll down</a>
+            <a href="#my_anchor">Click me to scroll down</a>
             <br>foo<br>foo<br>foo<br>foo<br>foo<br>foo<br>
             <a id="my_anchor"></a><br>bar<br>bar<br>bar<br>bar<br>bar<br>bar
             <br>hello!<br>hello!<br>hello!<br>hello!<br>hello!<br>hello!<br>hello!<br>hello!
@@ -37,10 +35,10 @@ class MainWindow(QtGui.QWidget):
             self.browser.setSource(QtCore.QUrl()) #stops the page from changing
             function = text.replace('a23://','')
             if hasattr(self,function):
-                getattr(self,function)(1232)
+                getattr(self,function)
 
-    def a_function(self,no):
-        print 'you called?'+str(no)
+    def a_function(self):
+        print 'you called?'
 
 app = QtGui.QApplication(sys.argv)
 window = MainWindow()

@@ -32,6 +32,9 @@
         <height>16777215</height>
        </size>
       </property>
+      <property name="toolTip">
+       <string>Total Time</string>
+      </property>
       <property name="text">
        <string>0</string>
       </property>
@@ -44,6 +47,9 @@
         <width>60</width>
         <height>16777215</height>
        </size>
+      </property>
+      <property name="toolTip">
+       <string>Current Time</string>
       </property>
       <property name="text">
        <string>0</string>
@@ -194,6 +200,9 @@
         <height>27</height>
        </size>
       </property>
+      <property name="toolTip">
+       <string>Play/Pause</string>
+      </property>
       <property name="text">
        <string>Play</string>
       </property>
@@ -207,6 +216,9 @@
         <height>27</height>
        </size>
       </property>
+      <property name="toolTip">
+       <string>Stop</string>
+      </property>
       <property name="text">
        <string>Stop</string>
       </property>
@@ -214,6 +226,9 @@
     </item>
     <item row="2" column="5">
      <widget class="QCheckBox" name="synVideo">
+      <property name="toolTip">
+       <string>Sync Video</string>
+      </property>
       <property name="text">
        <string>Sync Video</string>
       </property>
