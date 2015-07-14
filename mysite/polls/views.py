@@ -16,6 +16,7 @@ videoTime = 0
 haveQues = False
 synVideo = True
 isStopped = False
+timed = False
 
 def index (request):
     return HttpResponse("you reached index")
@@ -55,7 +56,7 @@ def SubAns (request):
         return HttpResponse(False)  #incorrect response
 
 def GetCurSet (request):
-    global videoTime, isPlay, haveQues, synVideo, isStopped
+    global videoTime, isPlay, haveQues, synVideo, isStopped, timed
 
     options = []
     if haveQues == False:
@@ -64,7 +65,8 @@ def GetCurSet (request):
             'isPlaying':isPlay,
             'haveQues':haveQues,
             'synVideo':synVideo,
-            'isStopped':isStopped
+            'isStopped':isStopped,
+            'timed':timed
         }
     else:
         q = Question.objects.order_by('-id')[0]
@@ -79,20 +81,24 @@ def GetCurSet (request):
             'synVideo':synVideo,
             'isStopped':isStopped,
             'question':ques_text,
-            'options':options
+            'options':options,
+            'timed':timed
         }
         haveQues = False
+    timed = False
     data2 = json.dumps(data)
     return HttpResponse(data2)
 
 def PostCurSet (request):
-    global videoTime, isPlay, synVideo, isStopped
+    global videoTime, isPlay, synVideo, isStopped, timed
     data = str(request.GET['data'])
     data = json.loads(data)
     videoTime = data['currentPosition']
     synVideo = data['synVideo']
     isPlay = not data['isPaused']
     isStopped = data['isStopped']
+    if data.has_key('timed'):
+        timed = data['timed']
     return HttpResponse('All is well') 
    
 def PostInsertQuery (request):
