@@ -16,7 +16,7 @@ class MainWindow(QtGui.QWidget):
             </style></head>
             <body>some text<br>
             <a href="a23://a_function">click me to call a function</a>
-            <br>
+            <br><p title="tootip">some block of text</p>
             <a href="#my_anchor">Click me to scroll down</a>
             <br><p class="p1">foo<br> 
             <table> <tr> <th> X </ th><th> Y</ th></ tr><tr> <td> Xx </ td><td> Yy</ td></ tr><tr> <td> Xxx </ td><td> Yyy</ td></ tr></ table>

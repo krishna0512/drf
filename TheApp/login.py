@@ -103,7 +103,7 @@ class Login(QtGui.QMainWindow,form_class):
 #                   self.snc.show()
                 # self is passed in the chat to gain the access to
                 # self.sessionid variable..
-                self.chat = Chat(self)
+                self.chat = Chat(self,isTA)
                 self.chat.show()
                 self.hide()
 

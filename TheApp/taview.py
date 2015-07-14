@@ -18,6 +18,7 @@ class TaView(QtGui.QWidget):
         self.timer = QtCore.QTimer(self)
         self.timer.setInterval(5000)
         self.timer.timeout.connect(self.updateUI)
+        self.timer.start()
         self.setGeometry(0,0,200,10)
         self.updateUI()
 

@@ -12,7 +12,7 @@ class Chat(QtGui.QMainWindow,form_class):
     """
         A simple chat box
     """
-    def __init__(self, master=None):
+    def __init__(self, master=None, isTA=False):
         QtGui.QMainWindow.__init__(self, master)
         self.setupUi(self)
         self.setWindowTitle("Chat Window")
@@ -41,6 +41,8 @@ class Chat(QtGui.QMainWindow,form_class):
         url = 'http://localhost:8000/polls/GetUserDetail'
         r=requests.get(url, cookies=cookies)
         self.username = str(r.text).split()[0]
+        self.isTA = isTA
+        print isTA
         self.textBrowser.setText(r.text)
 
         self.timer.start()
@@ -151,28 +153,38 @@ class Chat(QtGui.QMainWindow,form_class):
                     message += '<a class = "ques" href="id_://' + str(i['id']) + '_a_function">'
                     message += 'Q' + str(i['id']) + ')' + str(i['fromUser']) + ':</a><br />'
                     message += str(i['message']).replace('\n','<br />') 
-                    message += '<a class = "del" href="id_://' + str(i['id']) + '_b_function">X</a>' + '<br /><br />'  
+                    if self.isTA:
+                        message += '<a class = "del" href="id_://' + str(i['id']) + '_b_function">X</a>'
+                    message += '<br><br>'
                     if i['hasAns'] == True:
                         ans = i['ans']
                         for j in ans:
                             message += '<p class = "ans">A' + str(j['id']) + ')' + str(j['fromUser']) + ':</p>'
                             message += str(j['message']).replace('\n','<br />')
-                            message += '<a class = "del" href="id_://' + str(j['myId']) + '_c_function">X</a>' + '<br /><br />'  
+                            if self.isTA:
+                                message += '<a class = "del" href="id_://' + str(j['myId']) + '_c_function">X</a>'
+                            message += '<br><br>'
         else: 
             for i in m:
                 if i['isQues'] == True:
                     message += '<a class = "ques" href="id_://' + str(i['id']) + '_a_function">'
                     message += 'Q' + str(i['id']) + ')' + str(i['fromUser']) + ':</a><br />' 
                     message += str(i['message']).replace('\n','<br />')
-                    message += '<a class = "del" href="id_://' + str(i['id']) + '_b_function">X</a>' + '<br /><br />'  
+                    if self.isTA:
+                        message += '<a class = "del" href="id_://' + str(i['id']) + '_b_function">X</a>'
+                    message += '<br><br>'
                 elif i['isQues'] is False and i['isAns'] is True:
                     message += '<p class = "ans">A' + str(i['id']) + ')' + str(i['fromUser']) + ':</p>'
                     message += str(i['message']).replace('\n','<br />')
-                    message += '<a class = "del" href="id_://' + str(i['myId']) + '_c_function">X</a>' + '<br /><br />'  
+                    if self.isTA:
+                        message += '<a class = "del" href="id_://' + str(i['myId']) + '_c_function">X</a>'
+                    message += '<br><br>'
                 else:
                     message += str(i['fromUser']) + ':<br />'
                     message += str(i['message']).replace('\n','<br />')
-                    message += '<a class = "del" href="id_://' + str(i['id']) + '_b_function">X</a>' + '<br /><br />'  
+                    if self.isTA:
+                        message += '<a class = "del" href="id_://' + str(i['id']) + '_b_function">X</a>'
+                    message += '<br><br>'
 #       message += '<br />'
         message += '</p></body></html>'
         self.textBrowser.anchorClicked.connect(self.on_anchor_clicked)
@@ -232,8 +244,10 @@ class Chat(QtGui.QMainWindow,form_class):
             QtGui.QMessageBox.No, QtGui.QMessageBox.No)
 
         if reply == QtGui.QMessageBox.Yes:
+            cookies = {'sessionid':self.sessionid}
             url = 'http://localhost:8000/polls/Logout/'
-            r = requests.get(url)
+            r=requests.get(url, cookies=cookies)
+            #r = requests.get(url)
             event.accept()
         else:
             event.ignore() 
