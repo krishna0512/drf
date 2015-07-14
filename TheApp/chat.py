@@ -58,8 +58,14 @@ class Chat(QtGui.QMainWindow,form_class):
     	self.textArea.setText('')
 
     def submit(self):
-        payload={'name':self.username, 'message':str(self.textArea.toPlainText()).strip()}
-        if str(self.textArea.toPlainText()).strip() is not '':
+        m = str(self.textArea.toPlainText()).strip()
+        url = 'http://localhost:8000/polls/GetCurSet/'
+        r = requests.get(url)
+        timenow = json.loads(str(r.text))['curTime']
+        if m.find('@timenow') is not -1:
+            m = m.replace('@timenow', '<a href="time://' + str(timenow) + '">@' + str(timenow) + '</a>')
+        payload={'name':self.username, 'message':m}
+        if m is not '':
             if self.isQues.isChecked():
                 payload['isQues'] = True
                 payload['isAns' ] = False
@@ -107,6 +113,25 @@ class Chat(QtGui.QMainWindow,form_class):
             print temp[0]+'asdaszf '+temp[1]
             if hasattr(self,temp[1]):
                 getattr(self,temp[1])(temp[0])
+        elif text.startswith ('time://'):
+            self.textBrowser.setSource(QtCore.QUrl()) #stops the page from changing
+            print "Time sets instruction received."
+            t = text.replace ('time://', '')
+            print "time = " + t
+            url = 'http://localhost:8000/polls/GetCurSet/'
+            data = json.loads (str(requests.get(url).text))
+            print json.dumps(data)
+            data2={}
+            data2['currentPosition'] = int(t)
+            data2['synVideo'] = data['synVideo']
+            data2['isPaused'] = not data['isPlaying']
+            data2['isStopped'] = data['isStopped']
+            payload = json.dumps(data2)
+            payload = {'data':payload}
+            print payload
+            url = 'http://localhost:8000/polls/PostCurSet/'
+            r = requests.get(url,params=payload)
+            print r.status_code
 
     def a_function(self,no):
         print 'you called?'

@@ -50,6 +50,7 @@ class PopupQues(QtGui.QDialog):
         self.hide()
 
 #   def closeEvent(self, event):
+        self.setPosition(t)
 #       reply = QtGui.QMessageBox.question(self, 'Message',
 #           "Are you sure to quit?", QtGui.QMessageBox.Yes | 
 #           QtGui.QMessageBox.No, QtGui.QMessageBox.No)

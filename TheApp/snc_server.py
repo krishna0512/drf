@@ -285,6 +285,14 @@ class Player(QtGui.QMainWindow,form_class):
 
     def updateUI(self):
         """updates the user interface"""
+        url = 'http://localhost:8000/polls/GetCurSet/'
+        r = requests.get (url)
+        d = json.loads(str(r.text))
+        t = d['curTime']
+        if abs(t-self.mediaplayer.get_position()*1000) > 60:
+            self.setPosition(t/10)
+            print "setting manual position"
+            #self.timeslider.setValue(t)
         # setting the slider to the desired position
         self.timeslider.setValue(self.mediaplayer.get_position() * 1000)
         #displaying the current position of the video
