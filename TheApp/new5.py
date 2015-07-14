@@ -11,19 +11,25 @@ class MainWindow(QtGui.QWidget):
         self.browser.setHtml('''<html>
             <head><style type=text/css>
             a:link {color:green; text-decoration:none;}
-            a:hover {color:blue; text-decoration:underline}
+            .p1 {color : orange;}
+            .qq {color : red; float: right; }
             </style></head>
             <body>some text<br>
             <a href="a23://a_function">click me to call a function</a>
             <br>
             <a href="#my_anchor">Click me to scroll down</a>
-            <br>foo<br>foo<br>foo<br>foo<br>foo<br>foo<br>
+            <br><p class="p1">foo<br> 
+            <table> <tr> <th> X </ th><th> Y</ th></ tr><tr> <td> Xx </ td><td> Yy</ td></ tr><tr> <td> Xxx </ td><td> Yyy</ td></ tr></ table>
+            foo<br>foo<br>foo<br>foo<br>foo</p>
             <a id="my_anchor"></a><br>bar<br>bar<br>bar<br>bar<br>bar<br>bar
-            <br>hello!<br>hello!<br>hello!<br>hello!<br>hello!<br>hello!<br>hello!<br>hello!
+            <br>hello!<br>hello!<br>hello!<br>hello!<table> <tr> <th class="qq"> X </ th> </ tr></ table><br>hello!<br>hello!<br>hello!<br>hello!
             </body></html>''')
 
         self.browser.anchorClicked.connect(self.on_anchor_clicked)
-
+        style = '''  
+            background-color: red;
+            '''
+        #self.browser.setStyleSheet(style)
         main_layout.addWidget(self.browser)
 
         self.setLayout(main_layout)

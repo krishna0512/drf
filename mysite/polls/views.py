@@ -150,6 +150,15 @@ def Search(request):
     data = json.dumps(data)
     return HttpResponse(data)
 
+def Delete (request):
+    delId = int(request.GET['id'])
+    Post.objects.filter(id=delId).delete()
+    return HttpResponse('deleted')
+
+def ComDelete (request):
+    delId = int(request.GET['id'])
+    Comment.objects.filter(id=delId).delete()
+    return HttpResponse('deleted')
 
 def GetInsertQuery (request):
     s = ''
@@ -174,6 +183,7 @@ def GetInsertQuery (request):
                     c={}
                     b['hasAns'   ] = True
                     c['id'       ] = str(j.post.id)
+                    c['myId'     ] = j.id
                     c['message'  ] = str(j.message)
                     c['timestamp'] = str(j.timestamp)
                     c['fromUser' ] = str(j.fromUser)
@@ -196,6 +206,7 @@ def GetInsertQuery (request):
         for i in Comment.objects.all():
             b={}
             b['id'       ] = i.post.id
+            b['myId'     ] = i.id
             b['message'  ] = i.message
             b['timestamp'] = str(i.timestamp)
             b['fromUser' ] = i.fromUser

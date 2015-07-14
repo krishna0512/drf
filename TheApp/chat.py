@@ -111,6 +111,24 @@ class Chat(QtGui.QMainWindow,form_class):
         self.tagArea.setText(str(no))
         self.isAns.setChecked(True)
         print 'im leaving >.<'
+    
+    def c_function(self,no):
+        print 'you called?'
+        url = 'http://localhost:8000/polls/ComDelete/'
+        payload = {'id':no}
+        r = requests.get(url,params=payload)
+        if r.text == 'deleted':
+            print 'finally'
+        print 'im leaving >.<'
+   
+    def b_function(self,no):
+        print 'you called?'
+        url = 'http://localhost:8000/polls/Delete/'
+        payload = {'id':no}
+        r = requests.get(url,params=payload)
+        if r.text == 'deleted':
+            print 'finally'
+        print 'im leaving >.<'
    
     def updateMessage(self):
         url = 'http://localhost:8000/polls/GetInsertQuery/'
@@ -122,34 +140,41 @@ class Chat(QtGui.QMainWindow,form_class):
         # give state = timed for timestamp view and any other value for threaded view
         message = '''<html>
             <head><style type=text/css>
-            a:active {color:red; text-decoration:none;}
-            a:hover {color:blue; text-decoration:underline}
-            </style></head><body>'''
+            .ques {color:green; text-decoration:none; font-size: 15pt}
+            .ans  {color:blue; font-size:10pt; margin: 0px; padding:0px}
+            .del  {color:red; font-size:12pt; text-decoration:none}
+            p {margin : 0px; padding: 0px}
+            </style></head><body><p>'''
         if self.currentView == 'Threaded':
             for i in m:
                 if i['isQues'] == True:
-                    message += '<a href="id_://' + str(i['id']) + '_a_function">'
-                    message += '<h4>Q' + str(i['id']) + '</h4> ' + str(i['fromUser']) + ':</a><br />'
-                    message += str(i['message']).replace('\n','<br />') + '<br />'  
+                    message += '<a class = "ques" href="id_://' + str(i['id']) + '_a_function">'
+                    message += 'Q' + str(i['id']) + ')' + str(i['fromUser']) + ':</a><br />'
+                    message += str(i['message']).replace('\n','<br />') 
+                    message += '<a class = "del" href="id_://' + str(i['id']) + '_b_function">X</a>' + '<br /><br />'  
                     if i['hasAns'] == True:
                         ans = i['ans']
                         for j in ans:
-                            message += '<h5>A' + str(j['id']) + '</h5>' + str(j['fromUser']) + ':<br />'
-                            message += str(j['message']).replace('\n','<br />') +'<br />'
+                            message += '<p class = "ans">A' + str(j['id']) + ')' + str(j['fromUser']) + ':</p>'
+                            message += str(j['message']).replace('\n','<br />')
+                            message += '<a class = "del" href="id_://' + str(j['myId']) + '_c_function">X</a>' + '<br /><br />'  
         else: 
             for i in m:
                 if i['isQues'] == True:
-                    message += '<a href="id_://' + str(i['id']) + '_a_function">'
-                    message += '<h4>Q' + str(i['id']) + '</h4> ' + str(i['fromUser']) + ':</a><br />' 
-                    message += str(i['message']).replace('\n','<br />') + '<br />'
+                    message += '<a class = "ques" href="id_://' + str(i['id']) + '_a_function">'
+                    message += 'Q' + str(i['id']) + ')' + str(i['fromUser']) + ':</a><br />' 
+                    message += str(i['message']).replace('\n','<br />')
+                    message += '<a class = "del" href="id_://' + str(i['id']) + '_b_function">X</a>' + '<br /><br />'  
                 elif i['isQues'] is False and i['isAns'] is True:
-                    message += '<h5>A' + str(i['id']) + '</h5> ' + str(i['fromUser']) + ':<br />'
-                    message += str(i['message']).replace('\n','<br />') + '<br />'
+                    message += '<p class = "ans">A' + str(i['id']) + ')' + str(i['fromUser']) + ':</p>'
+                    message += str(i['message']).replace('\n','<br />')
+                    message += '<a class = "del" href="id_://' + str(i['myId']) + '_c_function">X</a>' + '<br /><br />'  
                 else:
                     message += str(i['fromUser']) + ':<br />'
-                    message += str(i['message']).replace('\n','<br />') + '<br />'
-        message += '<br />'
-        message += '</body></html>'
+                    message += str(i['message']).replace('\n','<br />')
+                    message += '<a class = "del" href="id_://' + str(i['id']) + '_b_function">X</a>' + '<br /><br />'  
+#       message += '<br />'
+        message += '</p></body></html>'
         self.textBrowser.anchorClicked.connect(self.on_anchor_clicked)
         # This is checking and updating the messages only when there is a change
         # testBrowser is dummy textBrower added in UI to match the newMessage so that scrolling can be effective
