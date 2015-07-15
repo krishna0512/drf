@@ -139,7 +139,7 @@ class Player(QtGui.QMainWindow,form_class):
         # Variables
         self.payload = {}
         self.payload['isPaused'] = False
-        self.payload['hasQues'] = False
+#       self.payload['hasQues'] = False
         self.payload['synVideo'] = True
         self.payload['isStopped'] = False
 
@@ -189,10 +189,10 @@ class Player(QtGui.QMainWindow,form_class):
         self.popup = PostQues()
         self.popup.show()
 
-    def popupExit(self, values):
-        self.payload['hasQues'] = True
-        for value in values:
-            self.payload[value] = values[value]
+#   def popupExit(self, values):
+#       self.payload['hasQues'] = True
+#       for value in values:
+#           self.payload[value] = values[value]
 
     def openFile(self, filename=None):
         """Open a media file in a MediaPlayer
@@ -288,11 +288,6 @@ class Player(QtGui.QMainWindow,form_class):
         url = 'http://localhost:8000/polls/GetCurSet/'
         r = requests.get (url)
         d = json.loads(str(r.text))
-        t = d['curTime']
-        if abs(t-self.mediaplayer.get_position()*1000) > 60:
-            self.setPosition(t/10)
-            print "setting manual position"
-            #self.timeslider.setValue(t)
         # setting the slider to the desired position
         self.timeslider.setValue(self.mediaplayer.get_position() * 1000)
         #displaying the current position of the video
@@ -311,8 +306,11 @@ class Player(QtGui.QMainWindow,form_class):
         data = {'data':data}
         url = 'http://localhost:8000/polls/PostCurSet/'
         r = requests.get(url,params = data)
-        if self.payload['hasQues'] == True:
-            self.payload['hasQues'] = False      #   The question has been sent so....
+        data = json.loads(r.text)
+        if data['timed'] == True:
+            self.timed = True
+            self.synVideo.setChecked(False)
+            self.setPosition(float(data['chatPos'])/10)
         if not self.mediaplayer.is_playing():    #   Check if somrthing is playing or paused else stop it  
             if not self.payload['isPaused']:
                 self.stop()

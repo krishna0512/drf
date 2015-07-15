@@ -17,6 +17,7 @@ haveQues = False
 synVideo = True
 isStopped = False
 timed = False
+chatPos = 0
 
 def index (request):
     return HttpResponse("you reached index")
@@ -56,17 +57,18 @@ def SubAns (request):
         return HttpResponse(False)  #incorrect response
 
 def GetCurSet (request):
-    global videoTime, isPlay, haveQues, synVideo, isStopped, timed
+    global videoTime, isPlay, haveQues, synVideo, isStopped, timed, chatPos
 
     options = []
     if haveQues == False:
         data = {
-            'curTime':videoTime,
-            'isPlaying':isPlay,
-            'haveQues':haveQues,
-            'synVideo':synVideo,
-            'isStopped':isStopped,
-            'timed':timed
+            'curTime'   :videoTime,
+            'isPlaying' :isPlay,
+            'haveQues'  :haveQues,
+            'synVideo'  :synVideo,
+            'isStopped' :isStopped,
+            'timed'     :timed,
+            'chatPos'   :chatPos
         }
     else:
         q = Question.objects.order_by('-id')[0]
@@ -75,31 +77,47 @@ def GetCurSet (request):
             options.append(str(option.choice_text))
   
         data = {
-            'curTime':videoTime,
-            'isPlaying':isPlay,
-            'haveQues':haveQues,
-            'synVideo':synVideo,
-            'isStopped':isStopped,
-            'question':ques_text,
-            'options':options,
-            'timed':timed
+            'curTime'   :videoTime,
+            'isPlaying' :isPlay,
+            'haveQues'  :haveQues,
+            'synVideo'  :synVideo,
+            'isStopped' :isStopped,
+            'question'  :ques_text,
+            'options'   :options,
+            'timed'     :timed,
+            'chatPos'   :chatPos
         }
         haveQues = False
-    timed = False
+    #timed = False
     data2 = json.dumps(data)
     return HttpResponse(data2)
 
 def PostCurSet (request):
-    global videoTime, isPlay, synVideo, isStopped, timed
+    global videoTime, isPlay, synVideo, isStopped, timed, chatPos
     data = str(request.GET['data'])
     data = json.loads(data)
-    videoTime = data['currentPosition']
-    synVideo = data['synVideo']
-    isPlay = not data['isPaused']
-    isStopped = data['isStopped']
-    if data.has_key('timed'):
-        timed = data['timed']
-    return HttpResponse('All is well') 
+    videoTime   = data['currentPosition']
+    synVideo    = data['synVideo'       ]
+    isPlay      = not data['isPaused'   ]
+    isStopped   = data['isStopped'      ]
+    data = {}
+    if timed == True:
+        data['timed'  ] = True
+        data['chatPos'] = chatPos
+        timed = False
+    else : 
+        data['timed'  ] = False
+        data['chatPos'] = videoTime
+    data = json.dumps(data)
+    return HttpResponse(data) 
+
+def PostTimedSet (request):
+    global timed, chatPos
+    data = str(request.GET['data'])
+    data = json.loads(data)
+    timed   = data['timed'  ]
+    chatPos = data['chatPos']
+    return HttpResponse('all is well')
    
 def PostInsertQuery (request):
     data = str(request.GET['data'])     # retrieving the data form the GET dictionary

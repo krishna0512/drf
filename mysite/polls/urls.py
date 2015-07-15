@@ -6,6 +6,7 @@ urlpatterns = [
     url(r'^$', index, name='index'),
     url(r'^GetCurSet/',         GetCurSet,          name='GetCurSet'        ),
     url(r'^PostCurSet/',        PostCurSet,         name='PostCurSet'       ),
+    url(r'^PostTimedSet/',      PostTimedSet,       name='PostTimedSet'     ),
     url(r'^PostQues/',          PostQues,           name='PostQues'         ),
     url(r'^SubAns/',            SubAns,             name='SubAns'           ),
     url(r'^PostInsertQuery/',   PostInsertQuery,    name='PostInsertQuery'  ),

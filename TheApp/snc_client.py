@@ -50,7 +50,6 @@ class PopupQues(QtGui.QDialog):
         self.hide()
 
 #   def closeEvent(self, event):
-        self.setPosition(t)
 #       reply = QtGui.QMessageBox.question(self, 'Message',
 #           "Are you sure to quit?", QtGui.QMessageBox.Yes | 
 #           QtGui.QMessageBox.No, QtGui.QMessageBox.No)
@@ -217,12 +216,12 @@ class Player(QtGui.QMainWindow,form_class):
     def popupExit(self):
         print 'exit'
 
-    def updatePosition (self):
+    def updatePosition (self, pos):
 #       print 'in updatePosition'
         curPos=self.mediaplayer.get_position()*1000
         buffer = StringIO()
         #getting the position of the server video
-        a = float(self.curPosition)
+        a = float(pos)
         if (a != ''):
             a=a
         else:
@@ -241,15 +240,19 @@ class Player(QtGui.QMainWindow,form_class):
         self.isPlaying   = self.data['isPlaying']
         self.isStopped   = self.data['isStopped']
         self.curPosition = self.data['curTime'  ]
+        self.chatPos     = self.data['chatPos'  ]
         self.haveQues    = self.data['haveQues' ]
-
+        self.timed       = self.data['timed'    ]
         if self.sync:
             self.Play = self.isPlaying
             self.isPaused = not self.isPlaying
-            self.updatePosition()
+            self.updatePosition(self.curPosition)
             if self.isStopped:
                 self.stop()
         
+        if self.timed and not self.sync :
+            self.updatePosition(self.chatPos)
+
         if self.haveQues:
             # self.isPlaying = False
             self.question = self.data['question']

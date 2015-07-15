@@ -32,7 +32,8 @@ class Chat(QtGui.QMainWindow,form_class):
         self.timer.timeout.connect (self.updateMessage)
 
         self.isChat.toggle()
-
+        self.qwqw = 0
+        self.wqwq = 0
         # This variable is derived from Login class of temp
         
         self.sessionid = str(master.sessionid)
@@ -105,32 +106,32 @@ class Chat(QtGui.QMainWindow,form_class):
 
     def on_anchor_clicked(self,url):
         text = str(url.toString())
+        self.timer.stop()
         print text
         if text.startswith('id_://'):
+            self.qwqw += 1
             self.textBrowser.setSource(QtCore.QUrl()) #stops the page from changing
             function = text.replace('id_://','')
             temp = function.split('_',1)
-            print temp[0]+'asdaszf '+temp[1]
+            print temp[0]+'asdaszf '+temp[1]+ '\t\tself.qwqw:' + str(self.qwqw)
             if hasattr(self,temp[1]):
                 getattr(self,temp[1])(temp[0])
         elif text.startswith ('time://'):
+            self.wqwq += 1
             self.textBrowser.setSource(QtCore.QUrl())
             print "Time sets instruction received."
             t = text.replace ('time://', '')
             print "time = " + t
-            url = 'http://localhost:8000/polls/GetCurSet/'
-            data = json.loads (str(requests.get(url).text))
-            print json.dumps(data)
-            data['currentPosition'] = int(t)
-            data['synVideo'] = False
-            data['isStopped'] = False
-            data ['timed'] = True
-            payload = json.dumps(data)
+            data2 = {}
+            data2['timed'          ] = True
+            data2['chatPos'        ] = int(t)
+            payload = json.dumps(data2)
             payload = {'data':payload}
             print payload
-            url = 'http://localhost:8000/polls/PostCurSet/'
+            url = 'http://localhost:8000/polls/PostTimedSet/'
             r = requests.get(url,params=payload)
-            print r.status_code
+            print str(r.status_code) + '\twqwq:' + str(self.wqwq)
+        self.timer.start()
 
     def a_function(self,no):
         print 'you called?'
