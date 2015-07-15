@@ -23,6 +23,7 @@ class Chat(QtGui.QMainWindow,form_class):
         self.menuThreaded.triggered.connect(self.changeViewToThreaded)
         self.menuExit.triggered.connect(sys.exit)
         self.searchArea.returnPressed.connect(self.search)
+        self.textBrowser.anchorClicked.connect(self.on_anchor_clicked)
         self.currentView = 'Timed'
         self.testBrowser.setVisible(False)
         self.isViewChanged = False
@@ -243,7 +244,7 @@ class Chat(QtGui.QMainWindow,form_class):
                     message += '<br><br>'
 #       message += '<br />'
         message += '</body></html>'
-        self.textBrowser.anchorClicked.connect(self.on_anchor_clicked)
+#self.textBrowser.anchorClicked.connect(self.on_anchor_clicked)
         # This is checking and updating the messages only when there is a change
         # testBrowser is dummy textBrower added in UI to match the newMessage so that scrolling can be effective
         self.testBrowser.setHtml(message)
