@@ -38,7 +38,7 @@ class Chat(QtGui.QMainWindow,form_class):
         self.sessionid = str(master.sessionid)
 
         cookies = {'sessionid':self.sessionid}
-        url = 'http://localhost:8000/polls/GetUserDetail'
+        url = 'http://localhost:8000/polls/GetUserDetail/'
         r=requests.get(url, cookies=cookies)
         self.username = str(r.text).split()[0]
         self.isTA = isTA
@@ -59,10 +59,10 @@ class Chat(QtGui.QMainWindow,form_class):
 
     def submit(self):
         m = str(self.textArea.toPlainText()).strip()
-        url = 'http://localhost:8000/polls/GetCurSet/'
-        r = requests.get(url)
-        timenow = json.loads(str(r.text))['curTime']
         if m.find('@timenow') is not -1:
+            url = 'http://localhost:8000/polls/GetCurSet/'
+            r = requests.get(url)
+            timenow = json.loads(str(r.text))['curTime']
             m = m.replace('@timenow', '<a href="time://' + str(timenow) + '">@' + str(timenow) + '</a>')
         payload={'name':self.username, 'message':m}
         if m is not '':
@@ -95,7 +95,7 @@ class Chat(QtGui.QMainWindow,form_class):
         self.menuThreaded.setChecked (False)
         self.currentView = 'Timed'
         self.isViewChanged = True
-        pass
+        pass 
 
     def changeViewToThreaded (self):
         self.menuTimed.setChecked (False)
@@ -114,19 +114,18 @@ class Chat(QtGui.QMainWindow,form_class):
             if hasattr(self,temp[1]):
                 getattr(self,temp[1])(temp[0])
         elif text.startswith ('time://'):
-            self.textBrowser.setSource(QtCore.QUrl()) #stops the page from changing
+            self.textBrowser.setSource(QtCore.QUrl())
             print "Time sets instruction received."
             t = text.replace ('time://', '')
             print "time = " + t
             url = 'http://localhost:8000/polls/GetCurSet/'
             data = json.loads (str(requests.get(url).text))
             print json.dumps(data)
-            data2={}
-            data2['currentPosition'] = int(t)
-            data2['synVideo'] = data['synVideo']
-            data2['isPaused'] = not data['isPlaying']
-            data2['isStopped'] = data['isStopped']
-            payload = json.dumps(data2)
+            data['currentPosition'] = int(t)
+            data['synVideo'] = False
+            data['isStopped'] = False
+            data ['timed'] = True
+            payload = json.dumps(data)
             payload = {'data':payload}
             print payload
             url = 'http://localhost:8000/polls/PostCurSet/'
