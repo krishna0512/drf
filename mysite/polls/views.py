@@ -202,10 +202,20 @@ def GetInsertQuery (request):
             b['timestamp'] = str(i.timestamp)
             b['isQues'   ] = i.isQues
             b['isAns'    ] = False
+            b['hasAns']    = False
+            b['ans']       = []
+            for j in i.comment_set.all():
+                b['hasAns'] = True
+                c = {}
+                c['id'] =str(j.post.id)
+                c['message'] = str(j.message)
+                c['fromUser'] = str(j.fromUser)
+                b['ans'].append(c)
             a.append(b)
         for i in Comment.objects.all():
             b={}
             b['id'       ] = i.post.id
+            b['postMessage'] = i.post.message
             b['myId'     ] = i.id
             b['message'  ] = i.message
             b['timestamp'] = str(i.timestamp)

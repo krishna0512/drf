@@ -128,6 +128,16 @@
    </item>
   </layout>
  </widget>
+ <tabstops>
+  <tabstop>username</tabstop>
+  <tabstop>password</tabstop>
+  <tabstop>email</tabstop>
+  <tabstop>fname</tabstop>
+  <tabstop>lname</tabstop>
+  <tabstop>okButton</tabstop>
+  <tabstop>checkBox</tabstop>
+  <tabstop>cancelButton</tabstop>
+ </tabstops>
  <resources/>
  <connections/>
 </ui>

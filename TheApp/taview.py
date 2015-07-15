@@ -33,7 +33,8 @@ class TaView(QtGui.QWidget):
         linUsers    =   json.loads(r.text)
         linStudents =   linUsers['student']
         linTA       =   linUsers['ta']
-
+        if self.layout():
+            QtGui.QWidget().setLayout(self.layout())    
         self.grid = QtGui.QGridLayout()
         self.grid.setSpacing(10)
 
@@ -67,7 +68,6 @@ class TaView(QtGui.QWidget):
                 self.grid.addWidget(self.cir[uin], 4+j+k, 0)
                 uin += 1
             k += 1
-            
         self.setLayout(self.grid) 
               
 

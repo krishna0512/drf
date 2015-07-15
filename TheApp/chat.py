@@ -156,6 +156,21 @@ class Chat(QtGui.QMainWindow,form_class):
         if r.text == 'deleted':
             print 'finally'
         print 'im leaving >.<'
+
+    def getAllAnsFor (self, qid):
+        url = 'http://localhost:8000/polls/GetInsertQuery/'
+        payload = {'state':self.currentView}
+        data = json.loads(str(requests.get(url,params=payload).text))
+        ans = []
+        s=''
+        for i in data:
+            if i['id'] == qid and i['isAns'] == False:
+                ans = i['ans']
+        for i in ans:
+            s += 'A' + str(qid) + ') ' + str(i['fromUser']) + ':\n'
+            s += str(i['message']) + '\n\n'
+        return s.strip()
+
    
     def updateMessage(self):
         url = 'http://localhost:8000/polls/GetInsertQuery/'
@@ -171,20 +186,27 @@ class Chat(QtGui.QMainWindow,form_class):
             .ans  {color:blue; font-size:10pt; margin: 0px; padding:0px}
             .del  {color:red; font-size:12pt; text-decoration:none}
             p {margin : 0px; padding: 0px}
-            </style></head><body><p>'''
+            </style></head><body>'''
         if self.currentView == 'Threaded':
             for i in m:
                 if i['isQues'] == True:
                     message += '<a class = "ques" href="id_://' + str(i['id']) + '_a_function">'
+                    if i['hasAns'] is True:
+                        message += '<p title=\'' + self.getAllAnsFor(i['id']) + '\'>'
+                       #message += '<p title="Answers are available">'
+                    else:
+                        message += '<p title="No Answer Available">'
                     message += 'Q' + str(i['id']) + ')' + str(i['fromUser']) + ':</a><br />'
                     message += str(i['message']).replace('\n','<br />') 
+                    message += '</p>'
                     if self.isTA:
                         message += '<a class = "del" href="id_://' + str(i['id']) + '_b_function">X</a>'
                     message += '<br><br>'
                     if i['hasAns'] == True:
                         ans = i['ans']
                         for j in ans:
-                            message += '<p class = "ans">A' + str(j['id']) + ')' + str(j['fromUser']) + ':</p>'
+                            message += '<p class="ans" title=\'Q' + str(i['id']) + ') ' + i['fromUser'] + ':\n' + i['message'] + '\'>'
+                            message += 'A' + str(j['id']) + ')' + str(j['fromUser']) + ':</p>'
                             message += str(j['message']).replace('\n','<br />')
                             if self.isTA:
                                 message += '<a class = "del" href="id_://' + str(j['myId']) + '_c_function">X</a>'
@@ -193,25 +215,34 @@ class Chat(QtGui.QMainWindow,form_class):
             for i in m:
                 if i['isQues'] == True:
                     message += '<a class = "ques" href="id_://' + str(i['id']) + '_a_function">'
+                    if i['hasAns'] is True:
+                        message += '<p title=\'' + self.getAllAnsFor(i['id']) + '\'>'
+                       #message += '<p title="Answers are available">'
+                    else:
+                        message += '<p title="No Answer Available">'
                     message += 'Q' + str(i['id']) + ')' + str(i['fromUser']) + ':</a><br />' 
                     message += str(i['message']).replace('\n','<br />')
+                    message += '</p>'
                     if self.isTA:
                         message += '<a class = "del" href="id_://' + str(i['id']) + '_b_function">X</a>'
                     message += '<br><br>'
                 elif i['isQues'] is False and i['isAns'] is True:
-                    message += '<p class = "ans">A' + str(i['id']) + ')' + str(i['fromUser']) + ':</p>'
+                    message += '<p class="ans" title=\'Q' + str(i['id']) + ') ' + i['fromUser'] + ':\n' + i['postMessage'] + '\'>'
+                    message += 'A' + str(i['id']) + ')' + str(i['fromUser']) + ':</p>'
                     message += str(i['message']).replace('\n','<br />')
                     if self.isTA:
                         message += '<a class = "del" href="id_://' + str(i['myId']) + '_c_function">X</a>'
                     message += '<br><br>'
                 else:
+                    message += '<p title=\'' + i['fromUser'] + ':\n' + i['message'] + '\'>'
                     message += str(i['fromUser']) + ':<br />'
                     message += str(i['message']).replace('\n','<br />')
+                    message += '</p>'
                     if self.isTA:
                         message += '<a class = "del" href="id_://' + str(i['id']) + '_b_function">X</a>'
                     message += '<br><br>'
 #       message += '<br />'
-        message += '</p></body></html>'
+        message += '</body></html>'
         self.textBrowser.anchorClicked.connect(self.on_anchor_clicked)
         # This is checking and updating the messages only when there is a change
         # testBrowser is dummy textBrower added in UI to match the newMessage so that scrolling can be effective
