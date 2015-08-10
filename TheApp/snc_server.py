@@ -4,6 +4,7 @@ import vlc
 import pycurl
 import json
 import requests
+from   taview       import *
 from dialog import Dialog
 from StringIO import StringIO
 from PyQt4 import QtGui, QtCore, uic
@@ -107,7 +108,7 @@ class PostQues(QtGui.QWidget):
 class Player(QtGui.QMainWindow,form_class):
     """A simple Media Player using VLC and Qt for server side
     """
-    def __init__(self, master=None):
+    def __init__(self, master=None, sid=None):
         QtGui.QMainWindow.__init__(self, master)
         self.setupUi(self)
         self.setWindowTitle("Media Player")
@@ -132,6 +133,7 @@ class Player(QtGui.QMainWindow,form_class):
         self.volumeslider.valueChanged.connect(self.setVolume)
         self.menuOpen.triggered.connect(self.openFile)
         self.menuPost.triggered.connect(self.postQues)
+        self.menuChatbox.triggered.connect (self.openChat)
         self.menuExit.triggered.connect(sys.exit)
 
         self.synVideo.toggle()
@@ -143,8 +145,21 @@ class Player(QtGui.QMainWindow,form_class):
         self.payload['synVideo'] = True
         self.payload['isStopped'] = False
 
+        self.sessionid = sid
+        self.chat = None
+
         if self.mediaplayer.play() == -1:
             self.playbutton.setText("Open")
+
+        self.openChat()
+
+
+    def openChat (self):
+        if self.chat:
+            self.chat.hide()
+        self.chat = Chat (self,True, self.sessionid)
+        self.chat.show()
+
 
     def keyPressEvent (self, event):
         key = event.key()

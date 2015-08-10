@@ -22,6 +22,16 @@ class TaView(QtGui.QWidget):
         self.setGeometry(0,0,200,10)
         self.updateUI()
 
+        self.payload = {}
+        self.payload['isPaused'] = False
+        self.payload['synVideo'] = False
+        self.payload['currentPosition'] = 0
+        self.payload['isStopped'] = False
+
+    def postSessionid (self, sid):
+        self.sessionid = sid
+        print sid
+
     def updateUI(self):
         url = 'http://localhost:8000/polls/GetAllUsers/'
         r           =   requests.get(url)
@@ -83,17 +93,24 @@ class TaView(QtGui.QWidget):
         r=requests.get(url,params=payload)
         self.hide()
 
-#   def closeEvent(self, event):
-#       reply = QtGui.QMessageBox.question(self, 'Message',
-#           "Are you sure to quit?", QtGui.QMessageBox.Yes | 
-#           QtGui.QMessageBox.No, QtGui.QMessageBox.No)
+    def closeEvent(self, event):
+        reply = QtGui.QMessageBox.question(self, 'Message',
+            "Are you sure to quit?", QtGui.QMessageBox.Yes | 
+            QtGui.QMessageBox.No, QtGui.QMessageBox.No)
 
-#       if reply == QtGui.QMessageBox.Yes:
-#           #master.isPlaying = master.data['isPlaying']
-#           event.accept()
-#       else:
-#           event.ignore() 
-#     
+        if reply == QtGui.QMessageBox.Yes:
+            self.payload['synVideo'] = False
+            data = json.dumps(self.payload)
+            data = {'data':data}
+            url = 'http://localhost:8000/polls/PostCurSet/'
+            r = requests.get(url,params = data)
+            cookies = {'sessionid':self.sessionid}
+            r=requests.get('http://localhost:8000/polls/Logout/', cookies=cookies)
+            print 'about to exit'
+            event.accept()
+        else:
+            event.ignore() 
+      
 
 
 if __name__ == "__main__":

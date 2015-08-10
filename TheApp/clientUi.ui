@@ -228,6 +228,7 @@
      <string>File</string>
     </property>
     <addaction name="menuOpen"/>
+    <addaction name="menuChatbox"/>
     <addaction name="menuExit"/>
    </widget>
    <widget class="QMenu" name="menuHelp">
@@ -258,6 +259,11 @@
   <action name="menuPost">
    <property name="text">
     <string>Post Question</string>
+   </property>
+  </action>
+  <action name="menuChatbox">
+   <property name="text">
+    <string>Open Chatbox</string>
    </property>
   </action>
  </widget>

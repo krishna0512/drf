@@ -12,7 +12,7 @@ class Chat(QtGui.QMainWindow,form_class):
     """
         A simple chat box
     """
-    def __init__(self, master=None, isTA=False):
+    def __init__(self, master=None, isTA=False, sid=None):
         QtGui.QMainWindow.__init__(self, master)
         self.setupUi(self)
         self.setWindowTitle("Chat Window")
@@ -37,7 +37,8 @@ class Chat(QtGui.QMainWindow,form_class):
         self.wqwq = 0
         # This variable is derived from Login class of temp
         
-        self.sessionid = str(master.sessionid)
+#self.sessionid = str(sid)
+        self.sessionid = str (master.sessionid)
 
         cookies = {'sessionid':self.sessionid}
         url = 'http://localhost:8000/polls/GetUserDetail/'
@@ -124,8 +125,8 @@ class Chat(QtGui.QMainWindow,form_class):
             t = text.replace ('time://', '')
             print "time = " + t
             data2 = {}
-            data2['timed'          ] = True
-            data2['chatPos'        ] = int(t)
+            data2['timed'  ] = True
+            data2['chatPos'] = int(t)
             payload = json.dumps(data2)
             payload = {'data':payload}
             print payload
@@ -295,21 +296,6 @@ class Chat(QtGui.QMainWindow,form_class):
         except ValueError:
             return False
         
-    def closeEvent(self, event):
-        reply = QtGui.QMessageBox.question(self, 'Message',
-            "Are you sure to quit?", QtGui.QMessageBox.Yes | 
-            QtGui.QMessageBox.No, QtGui.QMessageBox.No)
-
-        if reply == QtGui.QMessageBox.Yes:
-            cookies = {'sessionid':self.sessionid}
-            url = 'http://localhost:8000/polls/Logout/'
-            r=requests.get(url, cookies=cookies)
-            #r = requests.get(url)
-            event.accept()
-        else:
-            event.ignore() 
-
-
 
 if __name__ == "__main__":
     app = QtGui.QApplication(sys.argv)

@@ -5,6 +5,7 @@ import pycurl
 import requests
 import json
 from   dialog     import Dialog
+from taview import *
 from   random     import randint
 from   StringIO   import StringIO
 from   PyQt4      import QtGui, QtCore, uic
@@ -49,24 +50,13 @@ class PopupQues(QtGui.QDialog):
         r=requests.get(url,params=payload)
         self.hide()
 
-#   def closeEvent(self, event):
-#       reply = QtGui.QMessageBox.question(self, 'Message',
-#           "Are you sure to quit?", QtGui.QMessageBox.Yes | 
-#           QtGui.QMessageBox.No, QtGui.QMessageBox.No)
-
-#       if reply == QtGui.QMessageBox.Yes:
-#           #master.isPlaying = master.data['isPlaying']
-#           event.accept()
-#       else:
-#           event.ignore() 
-#       
 
 
 
 class Player(QtGui.QMainWindow,form_class):
     """A simple Media Player using VLC and Qt for client side
     """
-    def __init__(self, master=None):
+    def __init__(self,sid=None, master=None):
         QtGui.QMainWindow.__init__(self, master)
         self.setupUi(self)
         self.setWindowTitle("Media Player")
@@ -91,6 +81,7 @@ class Player(QtGui.QMainWindow,form_class):
         self.volumeslider.valueChanged.connect(self.setVolume)
         self.menuOpen.triggered.connect(self.openFile)
         self.menuExit.triggered.connect(sys.exit)
+        self.menuChatbox.triggered.connect (self.openChat)
 
         #variables
         self.data = {}
@@ -104,9 +95,20 @@ class Player(QtGui.QMainWindow,form_class):
         self.previousStatus = ''
         self.lastState = ''
         self.QuesSet = []
+        self.sessionid = sid
+        self.chat = None
 
         if self.mediaplayer.play() == -1:
             self.playbutton.setText("Open")
+
+        self.openChat()
+
+    def openChat (self):
+        if self.chat:
+            self.chat.hide()
+        self.chat = Chat (self, False, self.sessionid)
+        self.chat.show()
+
 
     def setPosition (self, position):
         self.mediaplayer.set_position(position/1000.0)
@@ -314,6 +316,24 @@ class Player(QtGui.QMainWindow,form_class):
                 self.stop()
 
 
+    def closeEvent(self, event):
+        reply = QtGui.QMessageBox.question(self, 'Message',
+            "Are you sure to quit?", QtGui.QMessageBox.Yes | 
+            QtGui.QMessageBox.No, QtGui.QMessageBox.No)
+
+        if reply == QtGui.QMessageBox.Yes:
+            #master.isPlaying = master.data['isPlaying']
+            print 'logging out'
+            print self.sessionid
+            cookies = {'sessionid':self.sessionid}
+            r=requests.get('http://localhost:8000/polls/Logout/', cookies=cookies)
+            event.accept()
+        else:
+            event.ignore() 
+     
+
+
+
 if __name__ == "__main__":
     app = QtGui.QApplication(sys.argv)
     player = Player()
@@ -322,3 +342,4 @@ if __name__ == "__main__":
     if sys.argv[1:]:
         player.openFile(sys.argv[1])
     sys.exit(app.exec_())
+
