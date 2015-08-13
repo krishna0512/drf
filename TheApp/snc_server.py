@@ -152,6 +152,7 @@ class Player(QtGui.QMainWindow,form_class):
             self.playbutton.setText("Open")
 
         self.openChat()
+        self.setGeometry(255,0,640,600)    
 
 
     def openChat (self):

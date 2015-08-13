@@ -47,6 +47,7 @@ class Chat(QtGui.QMainWindow,form_class):
         self.isTA = isTA
         print isTA
         self.textBrowser.setText(r.text)
+        self.setGeometry(900,0,360,596)    
 
         self.timer.start()
 
