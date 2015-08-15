@@ -56,6 +56,41 @@ def SubAns (request):
     else:
         return HttpResponse(False)  #incorrect response
 
+def GetCurSet2 (request):
+    global videoTime, isPlay, haveQues, synVideo, isStopped, timed, chatPos
+
+    options = []
+    if haveQues == False:
+        data = {
+            'curTime'   :videoTime,
+            'isPlaying' :isPlay,
+            'haveQues'  :haveQues,
+            'synVideo'  :synVideo,
+            'isStopped' :isStopped,
+            'timed'     :timed,
+            'chatPos'   :chatPos
+        }
+    else:
+        q = Question.objects.order_by('-id')[0]
+        ques_text = str(q.question_text)
+        for option in q.choice_set.all():
+            options.append(str(option.choice_text))
+  
+        data = {
+            'curTime'   :videoTime,
+            'isPlaying' :isPlay,
+            'haveQues'  :haveQues,
+            'synVideo'  :synVideo,
+            'isStopped' :isStopped,
+            'question'  :ques_text,
+            'options'   :options,
+            'timed'     :timed,
+            'chatPos'   :chatPos
+        }
+    #timed = False
+    data2 = json.dumps(data)
+    return HttpResponse(data2)
+
 def GetCurSet (request):
     global videoTime, isPlay, haveQues, synVideo, isStopped, timed, chatPos
 

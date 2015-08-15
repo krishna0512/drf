@@ -301,9 +301,9 @@ class Player(QtGui.QMainWindow,form_class):
 
     def updateUI(self):
         """updates the user interface"""
-        url = 'http://localhost:8000/polls/GetCurSet/'
-        r = requests.get (url)
-        d = json.loads(str(r.text))
+#        url = 'http://localhost:8000/polls/GetCurSet/'
+#        r = requests.get (url)
+#        d = json.loads(str(r.text))
         # setting the slider to the desired position
         self.timeslider.setValue(self.mediaplayer.get_position() * 1000)
         #displaying the current position of the video

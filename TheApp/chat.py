@@ -64,7 +64,7 @@ class Chat(QtGui.QMainWindow,form_class):
     def submit(self):
         m = str(self.textArea.toPlainText()).strip()
         if m.find('@timenow') is not -1:
-            url = 'http://localhost:8000/polls/GetCurSet/'
+            url = 'http://localhost:8000/polls/GetCurSet2/'
             r = requests.get(url)
             timenow = json.loads(str(r.text))['curTime']
             m = m.replace('@timenow', '<a href="time://' + str(timenow) + '">@' + str(timenow) + '</a>')

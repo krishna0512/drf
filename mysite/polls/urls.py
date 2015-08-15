@@ -5,6 +5,7 @@ from views import *
 urlpatterns = [
     url(r'^$', index, name='index'),
     url(r'^GetCurSet/',         GetCurSet,          name='GetCurSet'        ),
+    url(r'^GetCurSet2/',        GetCurSet2,         name='GetCurSet2'       ),
     url(r'^PostCurSet/',        PostCurSet,         name='PostCurSet'       ),
     url(r'^PostTimedSet/',      PostTimedSet,       name='PostTimedSet'     ),
     url(r'^PostQues/',          PostQues,           name='PostQues'         ),
