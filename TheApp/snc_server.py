@@ -320,8 +320,9 @@ class Player(QtGui.QMainWindow,form_class):
         self.payload['currentPosition']=int(self.mediaplayer.get_position()*10000)
         data = json.dumps(self.payload)
         data = {'data':data}
+        cookies = {'sessionid':self.sessionid}
         url = 'http://localhost:8000/polls/PostCurSet/'
-        r = requests.get(url,params = data)
+        r = requests.get(url,params = data, cookies=cookies)
         data = json.loads(r.text)
         if data['timed'] == True:
             self.timed = True

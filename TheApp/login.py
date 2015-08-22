@@ -91,6 +91,10 @@ class Login(QtGui.QMainWindow,form_class):
             else:
                 # Login Successfull
                 self.sessionid = r.cookies['sessionid']
+                print self.sessionid
+                # Initialising the request with the session variables
+                cookies = {'sessionid':self.sessionid}
+                requests.get('http://localhost:8000/polls/Initialise/', cookies=cookies)
                 data = json.loads(r.text)
                 isTA = data['isTA']
                 if isTA:
