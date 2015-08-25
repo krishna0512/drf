@@ -15,6 +15,7 @@ urlpatterns = [
     url(r'^Register/',          Register,           name='Register'         ),
     url(r'^Login/',             Login,              name='Login'            ),
     url(r'^Initialise/',        Initialise,         name='Initialise'       ),
+    url(r'^InitDigest/',        InitDigest,         name='InitDigest'       ),
     url(r'^Delete/',            Delete,             name='Delete'           ),
     url(r'^ComDelete/',         ComDelete,          name='ComDelete'        ),
     url(r'^Search/',            Search,             name='Search'           ),

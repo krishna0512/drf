@@ -3,6 +3,7 @@ import os
 import vlc
 import pycurl
 import requests
+import hashlib
 import json
 from   dialog     import Dialog
 from taview import *
@@ -119,16 +120,53 @@ class Player(QtGui.QMainWindow,form_class):
         """Open a media file in a MediaPlayer
         """
         print 'in openfile'
-        if filename == False:
-            filename = None
-        if filename is None:
-            filename = QtGui.QFileDialog.getOpenFileName(self, "Open File", os.path.expanduser('~'))
-        if not filename:
-            return
+        # First checking id we have the md5 of the file in session.
+        # we can have the md5 only if the server is already open.
+
+        cookies = {'sessionid':self.sessionid}
+        url = 'http://localhost:8000/polls/InitDigest/'
+        dig = str(requests.get(url,cookies=cookies).text)
+        # changing the filename according to the fact weather md5 is provided or not.
+
+# ========================================================================================================================
+
+        if dig is not '':
+            # retrive the filename if available.
+            # if not available then, take further actions by informing the user.
+            os.chdir('../SNC_folder')
+            filelist = []
+            for i in [k for asd,asdf,k in os.walk('.')][0]: filelist.append(os.getcwd() + '/' + i)
+            # calculated md5 is stored in form of dict in this variable
+            digest = {}
+            for i in filelist: digest[str(hashlib.md5(open(i).read(128)).hexdigest())] = i
+            if digest.has_key(dig):
+                filename = digest[dig]
+                print filename
+            else:
+                if filename is False:
+                    filename = None
+                if filename is None:
+                    filename = QtGui.QFileDialog.getOpenFileName(self, "Open File", os.path.expanduser('~'))
+                if not filename:
+                    return
+        else:
+            if filename is False:
+                filename = None
+            if filename is None:
+                filename = QtGui.QFileDialog.getOpenFileName(self, "Open File", os.path.expanduser('~'))
+            if not filename:
+                return
+
+
+# ========================================================================================================================
+
 
         # create the media
         if sys.version < '3':
             filename = unicode(filename)
+        print filename
+        print type(filename)
+
         self.media = self.instance.media_new(filename)
         # put the media in the media player
         self.mediaplayer.set_media(self.media)
@@ -236,8 +274,10 @@ class Player(QtGui.QMainWindow,form_class):
     def updateUI(self):
         """updates the user interface"""
         # setting the slider to the desired position
+        cookies = {'sessionid':self.sessionid}
         url = 'http://localhost:8000/polls/GetCurSet/'
         r=requests.get(url)
+        r = requests.get(url, cookies=cookies)
         self.data        = json.loads(r.text)
         self.sync        = self.data['synVideo' ]
         self.isPlaying   = self.data['isPlaying']

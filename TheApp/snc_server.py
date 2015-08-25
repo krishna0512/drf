@@ -4,6 +4,7 @@ import vlc
 import pycurl
 import json
 import requests
+import hashlib
 from   taview       import *
 from dialog import Dialog
 from StringIO import StringIO
@@ -223,6 +224,17 @@ class Player(QtGui.QMainWindow,form_class):
         # create the media
         if sys.version < '3':
             filename = unicode(filename)
+
+        f = open (filename)
+        dig = str(hashlib.md5(f.read(128)).hexdigest())
+        f.close()
+
+        data = {}
+        data['videoDigest'] = dig
+        cookies = {'sessionid':self.sessionid}
+        url = 'http://localhost:8000/polls/InitDigest/'
+        requests.get(url,params = data, cookies=cookies)
+        
         self.media = self.instance.media_new(filename)
         # put the media in the media player
         self.mediaplayer.set_media(self.media)

@@ -25,8 +25,26 @@ def Initialise (request):
     request.session['chatPos'] = 0
     return HttpResponse("current ")
 
+def InitDigest (request):
+    # This indicates the request is recieved from the snc_server
+    if request.GET.has_key('videoDigest'):
+        request.session['videoDigest'] = str(request.GET['videoDigest'])
+        return HttpResponse (str(request.session['videoDigest']))
+    # Now, handling the case when request is from snc_client
+    # the videoDigest is stored in the session variable of the snc_server
+    # so, we have check all the session variables of the users that are connected to the system
+    # and find if someone has the videoDigest in thier dic.
+    # if, someone has the videoDigest in theier dic then extract that and output it.
+    # if , not then output a blank string to indicate that the server has opened any file.
+    ret = ''
+    for i in [j.get_decoded() for j in Session.objects.all()]:
+        if i.has_key ('videoDigest'):
+            ret = i['videoDigest']
+
+    return HttpResponse (str (ret))
+
 def index (request):
-    return HttpResponse("is " )
+    return HttpResponse("is" )
 
 def PostQues (request):   
     question = str( request.GET['ques'] )
