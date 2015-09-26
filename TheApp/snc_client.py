@@ -276,7 +276,6 @@ class Player(QtGui.QMainWindow,form_class):
         # setting the slider to the desired position
         cookies = {'sessionid':self.sessionid}
         url = 'http://localhost:8000/polls/GetCurSet/'
-        r=requests.get(url)
         r = requests.get(url, cookies=cookies)
         self.data        = json.loads(r.text)
         self.sync        = self.data['synVideo' ]

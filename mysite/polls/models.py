@@ -28,3 +28,8 @@ class Record(models.Model):
     startedBy       = models.CharField (max_length=200)
     isActive        = models.BooleanField (default=False)
     isCompleted     = models.BooleanField (default=False)
+
+class Student (models.Model):
+    ques = models.ForeignKey (Question)
+    user = models.CharField ('name of user', max_length=200)
+    isCorrect = models.BooleanField ('is Correct', default=False)

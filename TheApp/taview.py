@@ -20,26 +20,29 @@ class TaView(QtGui.QWidget):
         self.timer.timeout.connect(self.updateUI)
         self.timer.start()
         self.setGeometry(0,0,200,10)
-        self.updateUI()
+        self.setMinimumSize(200,300)
 
         self.payload = {}
         self.payload['isPaused'] = False
         self.payload['synVideo'] = False
         self.payload['currentPosition'] = 0
         self.payload['isStopped'] = False
+        self.sessionid = ''
+        self.cookies = ''
+        self.updateUI()
 
     def postSessionid (self, sid):
         self.sessionid = sid
-        print sid
+        self.cookies = {'sessionid':self.sessionid}
 
     def updateUI(self):
         url = 'http://localhost:8000/polls/GetAllUsers/'
-        r           =   requests.get(url)
+        r           =   requests.get(url,cookies=self.cookies)
         users       =   json.loads(r.text)
         students    =   users['student']
         ta          =   users['ta']
         url = 'http://localhost:8000/polls/GetLoggedinUsers/'
-        r           =   requests.get(url)
+        r           =   requests.get(url,cookies=self.cookies)
         linUsers    =   json.loads(r.text)
         linStudents =   linUsers['student']
         linTA       =   linUsers['ta']
@@ -79,6 +82,14 @@ class TaView(QtGui.QWidget):
                 uin += 1
             k += 1
         self.setLayout(self.grid) 
+        self.scroll = QtGui.QScrollArea()
+        self.scroll.setWidgetResizable(True)
+        w2 = QtGui.QWidget(self)
+        w2.setLayout(self.grid)
+        self.scroll.setWidget(w2)
+        layout = QtGui.QVBoxLayout(self)
+        layout.addWidget(self.scroll)
+        self.setLayout(layout)
               
 
     def submit(self):
@@ -90,7 +101,7 @@ class TaView(QtGui.QWidget):
                 submitedAns.append(False)
         url = 'http://localhost:8000/polls/SubAns/'
         payload = {'options':submitedAns}
-        r=requests.get(url,params=payload)
+        r=requests.get(url,params=payload,cookies=self.cookies)
         self.hide()
 
     def closeEvent(self, event):
@@ -103,9 +114,8 @@ class TaView(QtGui.QWidget):
             data = json.dumps(self.payload)
             data = {'data':data}
             url = 'http://localhost:8000/polls/PostCurSet/'
-            r = requests.get(url,params = data)
-            cookies = {'sessionid':self.sessionid}
-            r=requests.get('http://localhost:8000/polls/Logout/', cookies=cookies)
+            r=requests.get(url,params = data,cookies=self.cookies)
+            r=requests.get('http://localhost:8000/polls/Logout/', cookies=self.cookies)
             print 'about to exit'
             event.accept()
         else:

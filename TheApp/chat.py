@@ -38,7 +38,8 @@ class Chat(QtGui.QMainWindow,form_class):
         # This variable is derived from Login class of temp
         
 #self.sessionid = str(sid)
-        self.sessionid = str (master.sessionid)
+#       self.sessionid = str (master.sessionid)
+        self.sessionid = sid
 
         cookies = {'sessionid':self.sessionid}
         url = 'http://localhost:8000/polls/GetUserDetail/'
@@ -65,7 +66,8 @@ class Chat(QtGui.QMainWindow,form_class):
         m = str(self.textArea.toPlainText()).strip()
         if m.find('@timenow') is not -1:
             url = 'http://localhost:8000/polls/GetCurSet2/'
-            r = requests.get(url)
+            cookies = {'sessionid':self.sessionid}
+            r = requests.get(url, cookies=cookies)
             timenow = json.loads(str(r.text))['curTime']
             m = m.replace('@timenow', '<a href="time://' + str(timenow) + '">@' + str(timenow) + '</a>')
         payload={'name':self.username, 'message':m}
@@ -81,8 +83,9 @@ class Chat(QtGui.QMainWindow,form_class):
                 payload['isQues'] = False
                 payload['isAns' ] = False
             url = 'http://localhost:8000/polls/PostInsertQuery/'
+            cookies = {'sessionid':self.sessionid}
             data = {'data':json.dumps(payload)}
-            r = requests.get(url,params = data)
+            r = requests.get(url,params = data,cookies = cookies)
             # Checks if the request is processed correctly by the server
             if int(r.status_code) == 500:
                 d = Dialog ('Invalid! Please Try Again..',self)
@@ -132,7 +135,8 @@ class Chat(QtGui.QMainWindow,form_class):
             payload = {'data':payload}
             print payload
             url = 'http://localhost:8000/polls/PostTimedSet/'
-            r = requests.get(url,params=payload)
+            cookies = {'sessionid':self.sessionid}
+            r = requests.get(url,params=payload,cookies=cookies)
             print str(r.status_code) + '\twqwq:' + str(self.wqwq)
         self.timer.start()
 
@@ -145,8 +149,9 @@ class Chat(QtGui.QMainWindow,form_class):
     def c_function(self,no):
         print 'you called?'
         url = 'http://localhost:8000/polls/ComDelete/'
+        cookies = {'sessionid':self.sessionid}
         payload = {'id':no}
-        r = requests.get(url,params=payload)
+        r = requests.get(url,params=payload,cookies=cookies)
         if r.text == 'deleted':
             print 'finally'
         print 'im leaving >.<'
@@ -154,16 +159,18 @@ class Chat(QtGui.QMainWindow,form_class):
     def b_function(self,no):
         print 'you called?'
         url = 'http://localhost:8000/polls/Delete/'
+        cookies = {'sessionid':self.sessionid}
         payload = {'id':no}
-        r = requests.get(url,params=payload)
+        r = requests.get(url,params=payload,cookies=cookies)
         if r.text == 'deleted':
             print 'finally'
         print 'im leaving >.<'
 
     def getAllAnsFor (self, qid):
         url = 'http://localhost:8000/polls/GetInsertQuery/'
+        cookies = {'sessionid':self.sessionid}
         payload = {'state':self.currentView}
-        data = json.loads(str(requests.get(url,params=payload).text))
+        data = json.loads(str(requests.get(url,params=payload,cookies=cookies).text))
         ans = []
         s=''
         for i in data:
@@ -177,15 +184,16 @@ class Chat(QtGui.QMainWindow,form_class):
    
     def updateMessage(self):
         url = 'http://localhost:8000/polls/GetInsertQuery/'
+        cookies = {'sessionid':self.sessionid}
         payload = {'state' : self.currentView}
-        r = requests.get(url, params=payload)
+        r = requests.get(url, params=payload,cookies=cookies)
         m = json.loads(r.text)
         original =  str(self.textBrowser.toHtml()).strip()
         # state can be threaded for threaded view or timed for timestamp view
         # give state = timed for timestamp view and any other value for threaded view
         message = '''<html>
             <head><style type=text/css>
-            .ques {color:green; text-decoration:none; font-size: 15pt}
+            .ques {color:green; text-decoration:none; font-size: 13pt}
             .ans  {color:blue; font-size:10pt; margin: 0px; padding:0px}
             .del  {color:red; font-size:12pt; text-decoration:none}
             p {margin : 0px; padding: 0px}
@@ -199,12 +207,12 @@ class Chat(QtGui.QMainWindow,form_class):
                        #message += '<p title="Answers are available">'
                     else:
                         message += '<p title="No Answer Available">'
-                    message += 'Q' + str(i['id']) + ')' + str(i['fromUser']) + ':</a><br />'
+                    message += 'Q' + str(i['id']) + ')' + str(i['fromUser']) + ':</a>'
                     message += str(i['message']).replace('\n','<br />') 
                     message += '</p>'
                     if self.isTA:
                         message += '<a class = "del" href="id_://' + str(i['id']) + '_b_function">X</a>'
-                    message += '<br><br>'
+                    message += '<br>'
                     if i['hasAns'] == True:
                         ans = i['ans']
                         for j in ans:
@@ -213,7 +221,7 @@ class Chat(QtGui.QMainWindow,form_class):
                             message += str(j['message']).replace('\n','<br />')
                             if self.isTA:
                                 message += '<a class = "del" href="id_://' + str(j['myId']) + '_c_function">X</a>'
-                            message += '<br><br>'
+                            message += '<br>'
         else: 
             for i in m:
                 if i['isQues'] == True:
@@ -223,19 +231,19 @@ class Chat(QtGui.QMainWindow,form_class):
                        #message += '<p title="Answers are available">'
                     else:
                         message += '<p title="No Answer Available">'
-                    message += 'Q' + str(i['id']) + ')' + str(i['fromUser']) + ':</a><br />' 
+                    message += 'Q' + str(i['id']) + ')' + str(i['fromUser']) + ':</a>' 
                     message += str(i['message']).replace('\n','<br />')
                     message += '</p>'
                     if self.isTA:
                         message += '<a class = "del" href="id_://' + str(i['id']) + '_b_function">X</a>'
-                    message += '<br><br>'
+                    message += '<br>'
                 elif i['isQues'] is False and i['isAns'] is True:
                     message += '<p class="ans" title=\'Q' + str(i['id']) + ') ' + i['fromUser'] + ':\n' + i['postMessage'] + '\'>'
                     message += 'A' + str(i['id']) + ')' + str(i['fromUser']) + ':</p>'
                     message += str(i['message']).replace('\n','<br />')
                     if self.isTA:
                         message += '<a class = "del" href="id_://' + str(i['myId']) + '_c_function">X</a>'
-                    message += '<br><br>'
+                    message += '<br>'
                 else:
                     message += '<p title=\'' + i['fromUser'] + ':\n' + i['message'] + '\'>'
                     message += str(i['fromUser']) + ':<br />'
@@ -243,7 +251,7 @@ class Chat(QtGui.QMainWindow,form_class):
                     message += '</p>'
                     if self.isTA:
                         message += '<a class = "del" href="id_://' + str(i['id']) + '_b_function">X</a>'
-                    message += '<br><br>'
+                    message += '<br>'
 #       message += '<br />'
         message += '</body></html>'
 #self.textBrowser.anchorClicked.connect(self.on_anchor_clicked)
@@ -264,8 +272,9 @@ class Chat(QtGui.QMainWindow,form_class):
             self.searchArea.clear()
         else :
             url = 'http://localhost:8000/polls/Search/'
+            cookies = {'sessionid':self.sessionid}
             payload = {'id' : int(self.searchArea.text())}
-            r = requests.get(url, params=payload)
+            r = requests.get(url, params=payload,cookies=cookies)
             m = json.loads(r.text)
             if int(r.status_code) == 500:
                 d = Dialog ('Invalid! Please Try Again..',self)

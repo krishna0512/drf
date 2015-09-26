@@ -193,7 +193,8 @@ class Player(QtGui.QMainWindow,form_class):
             data = json.dumps(self.payload)
             data = {'data':data}
             url = 'http://localhost:8000/polls/PostCurSet/'
-            r = requests.get(url,params = data)
+            cookies = {'sessionid':self.sessionid}
+            r = requests.get(url,params = data,cookies = cookies)
             print 'about to exit'
             event.accept()
         else:

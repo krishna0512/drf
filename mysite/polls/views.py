@@ -44,7 +44,7 @@ def InitDigest (request):
     return HttpResponse (str (ret))
 
 def index (request):
-    return HttpResponse("is" )
+    return HttpResponse("you reached index" )
 
 def PostQues (request):   
     question = str( request.GET['ques'] )
