@@ -18,10 +18,11 @@ class PopupQues(QtGui.QDialog):
     '''
         A simple class to present question to check presence
     '''
-    def __init__(self,master=None):
+    def __init__(self, master=None, sid=None):
         QtGui.QMainWindow.__init__(self, master)
         self.lbl1 = QtGui.QLabel(str(master.question), self)
         self.cb=[]
+        self.sessionid = sid
 
         self.grid = QtGui.QGridLayout()
         self.grid.setSpacing(10)
@@ -48,10 +49,9 @@ class PopupQues(QtGui.QDialog):
                 submitedAns.append(False)
         url = 'http://localhost:8000/polls/SubAns/'
         payload = {'options':submitedAns}
-        r=requests.get(url,params=payload)
+        cookies = {'sessionid':self.sessionid}
+        r=requests.get(url,params=payload, cookies=cookies)
         self.hide()
-
-
 
 
 class Player(QtGui.QMainWindow,form_class):
@@ -123,6 +123,7 @@ class Player(QtGui.QMainWindow,form_class):
         # First checking id we have the md5 of the file in session.
         # we can have the md5 only if the server is already open.
 
+        # getting the digest value from the snc_server
         cookies = {'sessionid':self.sessionid}
         url = 'http://localhost:8000/polls/InitDigest/'
         dig = str(requests.get(url,cookies=cookies).text)
@@ -138,10 +139,21 @@ class Player(QtGui.QMainWindow,form_class):
             for i in [k for asd,asdf,k in os.walk('.')][0]: filelist.append(os.getcwd() + '/' + i)
             # calculated md5 is stored in form of dict in this variable
             digest = {}
-            for i in filelist: digest[str(hashlib.md5(open(i).read(128)).hexdigest())] = i
-            if digest.has_key(dig):
-                filename = digest[dig]
-                print filename
+#for i in filelist: digest[str(hashlib.md5(open(i).read(128)).hexdigest())] = i
+
+            for i in filelist:
+                f = open(i)
+                s = str (hashlib.md5(f.read(128)).hexdigest())
+                f.close()
+                digest[s] = i
+                if digest.has_key(dig):
+                    filename = digest[dig]
+                    print filename
+                    break
+
+#            if digest.has_key(dig):
+#                filename = digest[dig]
+#                print filename
             else:
                 if filename is False:
                     filename = None
@@ -299,7 +311,7 @@ class Player(QtGui.QMainWindow,form_class):
             # self.isPlaying = False
             self.question = self.data['question']
             self.options  = self.data['options' ]
-            self.popup = PopupQues(self)
+            self.popup = PopupQues(self, self.sessionid)
             self.popup.show()
 
 

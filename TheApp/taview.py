@@ -51,11 +51,23 @@ class TaView(QtGui.QWidget):
         self.grid = QtGui.QGridLayout()
         self.grid.setSpacing(10)
 
-        self.lbl  = []
-        self.lbbl = []
-        self.cir  = []
+        self.lbl  = []      # name of the TAs
+        self.lbbl = []      # name of the Students
+        self.cir  = []      # the storage of the circles
+        self.ques = []      # gives weather question is true or false by the user.
         self.header1    = QtGui.QLabel('TAs:', self)
         self.header2    = QtGui.QLabel('Students:', self)
+
+        # getting the correct and incorrect users for the lastest question.
+        url = 'http://localhost:8000/polls/GetStatusOfQuestion/'
+        r = requests.get(url)
+        t = str(r.text)
+        print "taview:  " + t
+        # List of the the users that gave the correct answer to latest question.
+        cor = filter(None, t.split(';')[0].split(','))
+        # List of the users that gave incorrect answers to the latest question.
+        incor = filter(None, t.split(';')[1].split(','))
+
 
         self.grid.addWidget(self.header1, 1, 0, 1, 5)
         j = 0
@@ -75,6 +87,15 @@ class TaView(QtGui.QWidget):
         for i in students:
             self.lbbl.append(QtGui.QLabel(str(i),self))
             self.grid.addWidget(self.lbbl[k], 4+j+k, 1, 1, 4)
+#_---
+            if str(i) in cor:
+                self.ques.append (QtGui.QLabel('TRUE',self))
+            elif str(i) in incor:
+                self.ques.append (QtGui.QLabel('FALSE',self))
+            else:
+                self.ques.append (QtGui.QLabel('----',self))
+            self.grid.addWidget (self.ques[k], 4+j+k, 5)
+#-----
             if i in linStudents:
                 self.cir.append(QtGui.QLabel(u'\u25cf',self))
                 self.cir[uin].setStyleSheet("QLabel {color:#30ca30}")

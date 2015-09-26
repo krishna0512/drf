@@ -20,6 +20,7 @@ urlpatterns = [
     url(r'^ComDelete/',         ComDelete,          name='ComDelete'        ),
     url(r'^Search/',            Search,             name='Search'           ),
     url(r'^GetUserDetail/',     GetUserDetail,      name='GetUserDetail'    ),
+    url(r'^GetStatusOfQuestion/',GetStatusOfQuestion,name='GetStatusOfQuestion'),
     url(r'^Logout/',            Logout,             name='Logout'           ),
     url(r'^GetLoggedinUsers/',  GetLoggedinUsers,   name='GetLoggedinUsers' ),
     url(r'^GetAllUsers/',       GetAllUsers,        name='GetAllUsers'      )

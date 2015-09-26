@@ -196,6 +196,7 @@ class Player(QtGui.QMainWindow,form_class):
             cookies = {'sessionid':self.sessionid}
             r = requests.get(url,params = data,cookies = cookies)
             print 'about to exit'
+            self.playPause()
             event.accept()
         else:
             event.ignore() 

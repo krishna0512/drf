@@ -17,6 +17,8 @@ class Comment (models.Model):
 class Question(models.Model):
     question_text   = models.CharField ('Question Text', max_length=20000)
     pub_date        = models.DateTimeField ('date/time published')
+    correct         = models.CharField ('list of users given correct answers.', max_length=20000)
+    incorrect       = models.CharField ('list of users given incorrect ans...', max_length=20000)
 
 
 class Choice(models.Model):

@@ -21,7 +21,8 @@ isStopped = False
 
 def Initialise (request):
     request.session['timed'] = False
-    request.session['haveQues'] = False
+#   request.session['haveQues'] = False
+    request.session['lastQues'] = -1
     request.session['chatPos'] = 0
     return HttpResponse("current ")
 
@@ -51,7 +52,7 @@ def PostQues (request):
     options  = request.GET.getlist('options')
     curAns   = request.GET.getlist('currectAnswer')
 
-    q = Question(question_text = question, pub_date = timezone.now())
+    q = Question(question_text = question, pub_date = timezone.now(), correct = '', incorrect = '')
     q.save()
 
     i=0
@@ -62,32 +63,47 @@ def PostQues (request):
             q.choice_set.create(choice_text = str(option), isCurrect=False)
         i+=1
 
-    request.session['haveQues'] = True
-    return HttpResponse(request.session['haveQues'])
+#   request.session['haveQues'] = True
+    return HttpResponse('Question posted')
 
 
 def SubAns (request):
     submitedAns = request.GET.getlist('options')
     q = Question.objects.order_by('-id')[0]
+    user = str(request.user.username)
+    user += ','
 
     options = []
     for option in q.choice_set.all():
         options.append(str(option.isCurrect))
 
     if options == submitedAns:
+        q.correct += user
+        q.save()
         return HttpResponse(True)   #correct response
     else:
+        q.incorrect += user
+        q.save()
         return HttpResponse(False)  #incorrect response
+
+
+def GetStatusOfQuestion (request):
+    q = Question.objects.order_by('-id')[0]
+    cor = str(q.correct)
+    incor = str(q.incorrect)
+    ret = cor + ';' + incor
+    return HttpResponse (ret)
 
 def GetCurSet2 (request):
     global videoTime, isPlay, synVideo, isStopped
 
     options = []
-    if request.session['haveQues'] == False:
+    last_id = Question.objects.latest('id').id
+    if request.session['lastQues'] == last_id:
         data = {
             'curTime'   :videoTime,
             'isPlaying' :isPlay,
-            'haveQues'  :request.session['haveQues'],
+            'haveQues'  :False,
             'synVideo'  :synVideo,
             'isStopped' :isStopped,
             'timed'     :request.session['timed'],
@@ -102,7 +118,7 @@ def GetCurSet2 (request):
         data = {
             'curTime'   :videoTime,
             'isPlaying' :isPlay,
-            'haveQues'  :request.session['haveQues'],
+            'haveQues'  :True,
             'synVideo'  :synVideo,
             'isStopped' :isStopped,
             'question'  :ques_text,
@@ -118,11 +134,12 @@ def GetCurSet (request):
     global videoTime, isPlay, synVideo, isStopped
 
     options = []
-    if request.session['haveQues'] == False:
+    last_id = Question.objects.latest('id').id
+    if request.session['lastQues'] == last_id:
         data = {
             'curTime'   :videoTime,
             'isPlaying' :isPlay,
-            'haveQues'  :request.session['haveQues'],
+            'haveQues'  :False,
             'synVideo'  :synVideo,
             'isStopped' :isStopped,
             'timed'     :request.session['timed'],
@@ -137,7 +154,7 @@ def GetCurSet (request):
         data = {
             'curTime'   :videoTime,
             'isPlaying' :isPlay,
-            'haveQues'  :request.session['haveQues'],
+            'haveQues'  :True,
             'synVideo'  :synVideo,
             'isStopped' :isStopped,
             'question'  :ques_text,
@@ -145,7 +162,7 @@ def GetCurSet (request):
             'timed'     :request.session['timed'],
             'chatPos'   :request.session['chatPos']
         }
-        request.session['haveQues'] = False
+        request.session['lastQues'] = last_id
     #timed = False
     data2 = json.dumps(data)
     return HttpResponse(data2)
