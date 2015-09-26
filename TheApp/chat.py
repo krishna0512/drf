@@ -46,7 +46,6 @@ class Chat(QtGui.QMainWindow,form_class):
         r=requests.get(url, cookies=cookies)
         self.username = str(r.text).split()[0]
         self.isTA = isTA
-        print isTA
         self.textBrowser.setText(r.text)
         self.setGeometry(900,0,360,596)    
 
