@@ -7,6 +7,9 @@ from   dialog     import Dialog
 from   chat       import *
 from   StringIO   import StringIO
 from   PyQt4      import QtGui, QtCore, uic
+from   chat         import *
+import snc_server
+import snc_client 
 
 class TaView(QtGui.QWidget):
     '''
@@ -29,13 +32,18 @@ class TaView(QtGui.QWidget):
         self.payload['isStopped'] = False
         self.sessionid = ''
         self.cookies = ''
-        self.updateUI()
+        self.setAttribute(QtCore.Qt.WA_DeleteOnClose)
 
     def postSessionid (self, sid):
         self.sessionid = sid
         self.cookies = {'sessionid':self.sessionid}
 
+        self.snc = snc_server.Player(self, self.sessionid)
+        self.snc.show()
+        self.updateUI()
+
     def updateUI(self):
+        if self.snc == None: print "snc_server is None.."
         url = 'http://localhost:8000/polls/GetAllUsers/'
         r           =   requests.get(url,cookies=self.cookies)
         users       =   json.loads(r.text)
@@ -62,7 +70,6 @@ class TaView(QtGui.QWidget):
         url = 'http://localhost:8000/polls/GetStatusOfQuestion/'
         r = requests.get(url)
         t = str(r.text)
-        print "taview:  " + t
         # List of the the users that gave the correct answer to latest question.
         cor = filter(None, t.split(';')[0].split(','))
         # List of the users that gave incorrect answers to the latest question.
@@ -84,22 +91,21 @@ class TaView(QtGui.QWidget):
 
         self.grid.addWidget(self.header2, 3+j, 0, 1, 5)
         k = 0
+        uid2 = 0
         for i in students:
             self.lbbl.append(QtGui.QLabel(str(i),self))
             self.grid.addWidget(self.lbbl[k], 4+j+k, 1, 1, 4)
-#_---
-            if str(i) in cor:
-                self.ques.append (QtGui.QLabel('TRUE',self))
-            elif str(i) in incor:
-                self.ques.append (QtGui.QLabel('FALSE',self))
-            else:
-                self.ques.append (QtGui.QLabel('----',self))
-            self.grid.addWidget (self.ques[k], 4+j+k, 5)
-#-----
             if i in linStudents:
                 self.cir.append(QtGui.QLabel(u'\u25cf',self))
                 self.cir[uin].setStyleSheet("QLabel {color:#30ca30}")
                 self.grid.addWidget(self.cir[uin], 4+j+k, 0)
+                if str(i) in cor:
+                    self.ques.append (QtGui.QLabel(u"\u2714",self))
+                elif str(i) in incor:
+                    self.ques.append (QtGui.QLabel(u"\u274C",self))
+                else:
+                    self.ques.append (QtGui.QLabel('-',self))
+                self.grid.addWidget (self.ques[uid2], 4+j+k, 5)
                 uin += 1
             k += 1
         self.setLayout(self.grid) 

@@ -22,7 +22,7 @@ isStopped = False
 def Initialise (request):
     request.session['timed'] = False
 #   request.session['haveQues'] = False
-    request.session['lastQues'] = -1
+    request.session['lastQues'] = Question.objects.latest('id').id
     request.session['chatPos'] = 0
     return HttpResponse("current ")
 
@@ -132,38 +132,34 @@ def GetCurSet2 (request):
 
 def GetCurSet (request):
     global videoTime, isPlay, synVideo, isStopped
+    data = {
+        'curTime'   :videoTime,
+        'isPlaying' :isPlay,
+        'haveQues'  :False,
+        'synVideo'  :synVideo,
+        'isStopped' :isStopped,
+    }
 
     options = []
     last_id = Question.objects.latest('id').id
-    if request.session['lastQues'] == last_id:
-        data = {
-            'curTime'   :videoTime,
-            'isPlaying' :isPlay,
-            'haveQues'  :False,
-            'synVideo'  :synVideo,
-            'isStopped' :isStopped,
-            'timed'     :request.session['timed'],
-            'chatPos'   :request.session['chatPos']
-        }
-    else:
+    if request.session['lastQues'] != last_id:
         q = Question.objects.order_by('-id')[0]
         ques_text = str(q.question_text)
         for option in q.choice_set.all():
             options.append(str(option.choice_text))
   
-        data = {
-            'curTime'   :videoTime,
-            'isPlaying' :isPlay,
-            'haveQues'  :True,
-            'synVideo'  :synVideo,
-            'isStopped' :isStopped,
-            'question'  :ques_text,
-            'options'   :options,
-            'timed'     :request.session['timed'],
-            'chatPos'   :request.session['chatPos']
-        }
+        data['question'] = ques_text
+        data['options']  = options
         request.session['lastQues'] = last_id
-    #timed = False
+
+    if request.session['timed'] == True :
+        data['timed'  ] = True
+        data['chatPos'] = request.session['chatPos']
+        request.session['timed'] = False
+    else :
+        data['timed'  ] = False
+        data['chatPos'] = videoTime
+
     data2 = json.dumps(data)
     return HttpResponse(data2)
 

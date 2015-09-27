@@ -1,3 +1,7 @@
+from   taview     import *
+from   dialog     import Dialog
+from   StringIO   import StringIO
+from   PyQt4      import QtGui, QtCore, uic
 import sys
 import os.path
 import vlc
@@ -5,10 +9,6 @@ import pycurl
 import json
 import requests
 import hashlib
-from   taview       import *
-from dialog import Dialog
-from StringIO import StringIO
-from PyQt4 import QtGui, QtCore, uic
 
 form_class = uic.loadUiType("serverUi.ui")[0]
 
@@ -182,13 +182,17 @@ class Player(QtGui.QMainWindow,form_class):
                 position = int(self.mediaplayer.get_position()*1000)
                 if position > 1000:
                     setPosition(position - 1000)
-    
+#   
+#   def closeWindow(self):
+#       QtCore.QCoreApplication.instance().quit()
+
     def closeEvent(self, event):
         reply = QtGui.QMessageBox.question(self, 'Message',
-            "Are you sure to quit?", QtGui.QMessageBox.Yes | 
+            "Are you sure to quit????????", QtGui.QMessageBox.Yes | 
             QtGui.QMessageBox.No, QtGui.QMessageBox.No)
 
         if reply == QtGui.QMessageBox.Yes:
+            self.timer.stop()
             self.payload['synVideo'] = False
             data = json.dumps(self.payload)
             data = {'data':data}
@@ -196,7 +200,8 @@ class Player(QtGui.QMainWindow,form_class):
             cookies = {'sessionid':self.sessionid}
             r = requests.get(url,params = data,cookies = cookies)
             print 'about to exit'
-            self.playPause()
+            # TODO
+            self.stop()
             event.accept()
         else:
             event.ignore() 
@@ -302,8 +307,8 @@ class Player(QtGui.QMainWindow,form_class):
             sec=curTime%60
             minute=curTime/60
             if minute>=60:
-                minute=minute%60
                 hour=minute/60
+                minute=minute%60
                 minute = str(minute if minute>=10 else '0'+str(minute))
                 sec = str(sec if sec>=10 else '0'+str(sec))
                 curTime = str(hour) +':'+ minute +':'+ sec

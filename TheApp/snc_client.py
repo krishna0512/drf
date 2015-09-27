@@ -1,3 +1,8 @@
+from   dialog     import Dialog
+from   taview     import *
+from   random     import randint
+from   StringIO   import StringIO
+from   PyQt4      import QtGui, QtCore, uic
 import sys
 import os
 import vlc
@@ -5,11 +10,6 @@ import pycurl
 import requests
 import hashlib
 import json
-from   dialog     import Dialog
-from taview import *
-from   random     import randint
-from   StringIO   import StringIO
-from   PyQt4      import QtGui, QtCore, uic
 
 form_class = uic.loadUiType("clientUi.ui")[0]
 
@@ -87,11 +87,11 @@ class Player(QtGui.QMainWindow,form_class):
         #variables
         self.data = {}
         self.isPlaying = False
-        self.isPaused = False
+        self.isPaused = True
         self.isStopped = False
         self.haveQues = False
         self.sync = False
-        self.Play = True
+        self.Play = False
         self.curPosition = 0
         self.previousStatus = ''
         self.lastState = ''
@@ -146,14 +146,14 @@ class Player(QtGui.QMainWindow,form_class):
                 s = str (hashlib.md5(f.read(128)).hexdigest())
                 f.close()
                 digest[s] = i
-                if digest.has_key(dig):
-                    filename = digest[dig]
-                    print filename
-                    break
+#               if digest.has_key(dig):
+#                   filename = digest[dig]
+#                   print filename
+#                   break
 
-#            if digest.has_key(dig):
-#                filename = digest[dig]
-#                print filename
+            if digest.has_key(dig):
+                filename = digest[dig]
+                print filename
             else:
                 if filename is False:
                     filename = None
@@ -172,6 +172,13 @@ class Player(QtGui.QMainWindow,form_class):
 
 # ========================================================================================================================
 
+        f = open (filename)
+        s = str(hashlib.md5(f.read(128)).hexdigest())
+        print s + '\n' + dig
+        if s != dig and dig!='':
+            self.dlg = Dialog('Open the same file')
+            self.dlg.show()
+            return
 
         # create the media
         if sys.version < '3':
@@ -199,30 +206,15 @@ class Player(QtGui.QMainWindow,form_class):
             self.mediaplayer.set_hwnd(self.videoframe.winId())
         elif sys.platform == "darwin": # for MacOS
             self.mediaplayer.set_nsobject(self.videoframe.winId())
-        self.timer.start()
         self.playbutton.setText("Play")
         self.playPause()
+        self.timer.start()
 
 
     def keyPressEvent (self, event):
         key = event.key()
         if key == QtCore.Qt.Key_Space:
             self.playbutton.animateClick()
-#       if key == QtCore.Qt.Key_Up:
-#           volume = int(self.mediaplayer.audio_get_volue())
-#           setVolume(volume+5)
-#       if key == QtCore.Qt.Key_Down:
-#           volume = int(self.mediaplayer.audio_get_volue())
-#           setVolume(volume-5)
-#       if key == QtCore.Qt.Key_Left:
-#           if self.sync == True:
-#               position = int(self.mediaplayer.get_position()*1000)
-#               setPosition(position + 1000)
-#       if key == QtCore.Qt.Key_Right:
-#           if self.sync == True:
-#               position = int(self.mediaplayer.get_position()*1000)
-#               if position > 1000:
-#                   setPosition(position - 1000)
     
     def stop(self):
         """Stop player
@@ -241,26 +233,33 @@ class Player(QtGui.QMainWindow,form_class):
         """Toggle play/pause status (can only be used for client side.)
         """
         print 'play pause'
+        print self.Play
+        print self.sync
         if self.Play:
-            print 1
             if self.mediaplayer.play() == -1:
                 self.openFile()
                 return
             self.mediaplayer.play()
             self.playbutton.setText("Pause")
-            self.playbutton.setIcon(QtGui.QIcon('pauseButton.png'))
+            print 1
+            self.playbutton.setIcon(QtGui.QIcon('pauseButton2.png'))
+            print 1
             self.playbutton.setIconSize(QtCore.QSize(24,24))
+            print 1
             self.isPaused = False
         else :
-            print 2
             self.mediaplayer.pause()
             self.playbutton.setText("Play")
-            self.playbutton.setIcon(QtGui.QIcon('playButton.png'))
+            print 2
+            self.playbutton.setIcon(QtGui.QIcon('playButton2.png'))
+            print 2
             self.playbutton.setIconSize(QtCore.QSize(24,24))
+            print 2
             self.isPaused = True
 
     def asynPlay(self):
         if not self.sync:
+            print "in asyncPlay"
             self.isPaused = not self.isPaused
             self.Play = not self.isPaused
             self.playPause()
@@ -324,8 +323,8 @@ class Player(QtGui.QMainWindow,form_class):
             sec=curTime%60
             minute=curTime/60
             if minute>=60:
-                minute=minute%60
                 hour=minute/60
+                minute=minute%60
                 minute = str(minute if minute>=10 else '0'+str(minute))
                 sec = str(sec if sec>=10 else '0'+str(sec))
                 curTime = str(hour) +':'+ minute +':'+ sec
@@ -342,8 +341,8 @@ class Player(QtGui.QMainWindow,form_class):
             sec=fullTime%60
             minute=fullTime/60
             if minute>=60:
-                minute=minute%60
                 hour=minute/60
+                minute=minute%60
                 minute = str(minute if minute>=10 else '0'+str(minute))
                 sec = str(sec if sec>=10 else '0'+str(sec))
                 fullTime = str(hour) +':'+ minute +':'+ sec
@@ -377,6 +376,7 @@ class Player(QtGui.QMainWindow,form_class):
             #master.isPlaying = master.data['isPlaying']
             print 'logging out'
             print self.sessionid
+            self.timer.stop()
             cookies = {'sessionid':self.sessionid}
             r=requests.get('http://localhost:8000/polls/Logout/', cookies=cookies)
             event.accept()

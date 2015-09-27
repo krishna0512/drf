@@ -1,15 +1,15 @@
+from   dialog       import Dialog
+from   chat         import *
+from   taview       import *
+from   StringIO     import StringIO
+from   PyQt4        import QtGui, QtCore, uic
 import sys
 import os.path
 import time
 import requests
 import json
-from   dialog       import Dialog
-from   chat         import *
-from   taview       import *
 import snc_server
 import snc_client 
-from   StringIO     import StringIO
-from   PyQt4        import QtGui, QtCore, uic
 
 form_class = uic.loadUiType("login.ui")[0]
 form2_class = uic.loadUiType("register.ui")[0]
@@ -100,8 +100,8 @@ class Login(QtGui.QMainWindow,form_class):
                     self.dpl = TaView()
                     self.dpl.postSessionid (self.sessionid)
                     self.dpl.show()
-                    self.snc = snc_server.Player(self, self.sessionid)
-                    self.snc.show()
+#                   self.snc = snc_server.Player(self, self.sessionid)
+#                   self.snc.show()
                 else:
                     self.snc = snc_client.Player(self.sessionid)
                     self.snc.show()
