@@ -1,5 +1,5 @@
 *.pyc
-*.swp
+.*.swp
 *.mp4
 
 mysite/db.sqlite3

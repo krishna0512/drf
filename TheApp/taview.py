@@ -75,6 +75,8 @@ class TaView(QtGui.QWidget):
         cor = filter(None, t.split(';')[0].split(','))
         # List of the users that gave incorrect answers to the latest question.
         incor = filter(None, t.split(';')[1].split(','))
+        print cor
+        print incor
 
 
         self.grid.addWidget(self.header1, 1, 0, 1, 5)
@@ -100,13 +102,17 @@ class TaView(QtGui.QWidget):
                 self.cir.append(QtGui.QLabel(u'\u25cf',self))
                 self.cir[uin].setStyleSheet("QLabel {color:#30ca30}")
                 self.grid.addWidget(self.cir[uin], 4+j+k, 0)
+                print str(i)
                 if str(i) in cor:
+                    print "in correct"
                     self.ques.append (QtGui.QLabel(u"\u2714",self))
                 elif str(i) in incor:
+                    print "in incorrect"
                     self.ques.append (QtGui.QLabel(u"\u274C",self))
                 else:
                     self.ques.append (QtGui.QLabel('-',self))
                 self.grid.addWidget (self.ques[uid2], 4+j+k, 5)
+                uid2 += 1
                 uin += 1
             k += 1
         self.setLayout(self.grid) 

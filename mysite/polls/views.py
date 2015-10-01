@@ -148,6 +148,7 @@ def GetCurSet (request):
         for option in q.choice_set.all():
             options.append(str(option.choice_text))
   
+        data['haveQues'] = True
         data['question'] = ques_text
         data['options']  = options
         request.session['lastQues'] = last_id
