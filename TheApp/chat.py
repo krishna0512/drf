@@ -166,11 +166,11 @@ class Chat(QtGui.QMainWindow,form_class):
             print 'finally'
         print 'im leaving >.<'
 
-    def getAllAnsFor (self, qid):
-        url = URL + 'GetInsertQuery/'
-        cookies = {'sessionid':self.sessionid}
-        payload = {'state':self.currentView}
-        data = json.loads(str(requests.get(url,params=payload,cookies=cookies).text))
+    def getAllAnsFor (self, qid, data):
+#       url = URL + 'GetInsertQuery/'
+#       cookies = {'sessionid':self.sessionid}
+#       payload = {'state':self.currentView}
+#       data = json.loads(str(requests.get(url,params=payload,cookies=cookies).text))
         ans = []
         s=''
         for i in data:
@@ -203,7 +203,7 @@ class Chat(QtGui.QMainWindow,form_class):
                 if i['isQues'] == True:
                     message += '<a class = "ques" href="id_://' + str(i['id']) + '_a_function">'
                     if i['hasAns'] is True:
-                        message += '<p title=\'' + self.getAllAnsFor(i['id']) + '\'>'
+                        message += '<p title=\'' + self.getAllAnsFor(i['id'], m) + '\'>'
                        #message += '<p title="Answers are available">'
                     else:
                         message += '<p title="No Answer Available">'
@@ -227,7 +227,7 @@ class Chat(QtGui.QMainWindow,form_class):
                 if i['isQues'] == True:
                     message += '<a class = "ques" href="id_://' + str(i['id']) + '_a_function">'
                     if i['hasAns'] is True:
-                        message += '<p title=\'' + self.getAllAnsFor(i['id']) + '\'>'
+                        message += '<p title=\'' + self.getAllAnsFor(i['id'], m) + '\'>'
                        #message += '<p title="Answers are available">'
                     else:
                         message += '<p title="No Answer Available">'

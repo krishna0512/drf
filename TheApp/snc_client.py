@@ -289,6 +289,7 @@ class Player(QtGui.QMainWindow,form_class):
         cookies = {'sessionid':self.sessionid}
         url = URL + 'GetCurSet/'
         r = requests.get(url, cookies=cookies)
+        if r.status_code != 200: print r.status_code
         self.data        = json.loads(r.text)
         self.sync        = self.data['synVideo' ]
         self.isPlaying   = self.data['isPlaying']
@@ -308,6 +309,7 @@ class Player(QtGui.QMainWindow,form_class):
             self.updatePosition(self.chatPos)
 
         if self.haveQues:
+            print "question recieved."
             # self.isPlaying = False
             self.question = self.data['question']
             self.options  = self.data['options' ]
