@@ -5,6 +5,7 @@ import json
 from dialog import Dialog
 from StringIO import StringIO
 from PyQt4 import QtGui, QtCore, uic
+from header import *
 
 form_class = uic.loadUiType("chat.ui")[0]
 
@@ -42,7 +43,7 @@ class Chat(QtGui.QMainWindow,form_class):
         self.sessionid = sid
 
         cookies = {'sessionid':self.sessionid}
-        url = 'http://localhost:8000/polls/GetUserDetail/'
+        url = URL + 'GetUserDetail/'
         r=requests.get(url, cookies=cookies)
         self.username = str(r.text).split()[0]
         self.isTA = isTA
@@ -64,7 +65,7 @@ class Chat(QtGui.QMainWindow,form_class):
     def submit(self):
         m = str(self.textArea.toPlainText()).strip()
         if m.find('@timenow') is not -1:
-            url = 'http://localhost:8000/polls/GetCurSet2/'
+            url = URL + 'GetCurSet2/'
             cookies = {'sessionid':self.sessionid}
             r = requests.get(url, cookies=cookies)
             timenow = json.loads(str(r.text))['curTime']
@@ -81,7 +82,7 @@ class Chat(QtGui.QMainWindow,form_class):
             else:
                 payload['isQues'] = False
                 payload['isAns' ] = False
-            url = 'http://localhost:8000/polls/PostInsertQuery/'
+            url = URL + 'PostInsertQuery/'
             cookies = {'sessionid':self.sessionid}
             data = {'data':json.dumps(payload)}
             r = requests.get(url,params = data,cookies = cookies)
@@ -133,7 +134,7 @@ class Chat(QtGui.QMainWindow,form_class):
             payload = json.dumps(data2)
             payload = {'data':payload}
             print payload
-            url = 'http://localhost:8000/polls/PostTimedSet/'
+            url = URL + 'PostTimedSet/'
             cookies = {'sessionid':self.sessionid}
             r = requests.get(url,params=payload,cookies=cookies)
             print str(r.status_code) + '\twqwq:' + str(self.wqwq)
@@ -147,7 +148,7 @@ class Chat(QtGui.QMainWindow,form_class):
     
     def c_function(self,no):
         print 'you called?'
-        url = 'http://localhost:8000/polls/ComDelete/'
+        url = URL + 'ComDelete/'
         cookies = {'sessionid':self.sessionid}
         payload = {'id':no}
         r = requests.get(url,params=payload,cookies=cookies)
@@ -157,7 +158,7 @@ class Chat(QtGui.QMainWindow,form_class):
    
     def b_function(self,no):
         print 'you called?'
-        url = 'http://localhost:8000/polls/Delete/'
+        url = URL + 'Delete/'
         cookies = {'sessionid':self.sessionid}
         payload = {'id':no}
         r = requests.get(url,params=payload,cookies=cookies)
@@ -166,7 +167,7 @@ class Chat(QtGui.QMainWindow,form_class):
         print 'im leaving >.<'
 
     def getAllAnsFor (self, qid):
-        url = 'http://localhost:8000/polls/GetInsertQuery/'
+        url = URL + 'GetInsertQuery/'
         cookies = {'sessionid':self.sessionid}
         payload = {'state':self.currentView}
         data = json.loads(str(requests.get(url,params=payload,cookies=cookies).text))
@@ -182,7 +183,7 @@ class Chat(QtGui.QMainWindow,form_class):
 
    
     def updateMessage(self):
-        url = 'http://localhost:8000/polls/GetInsertQuery/'
+        url = URL + 'GetInsertQuery/'
         cookies = {'sessionid':self.sessionid}
         payload = {'state' : self.currentView}
         r = requests.get(url, params=payload,cookies=cookies)
@@ -270,7 +271,7 @@ class Chat(QtGui.QMainWindow,form_class):
             d.show()
             self.searchArea.clear()
         else :
-            url = 'http://localhost:8000/polls/Search/'
+            url = URL + 'Search/'
             cookies = {'sessionid':self.sessionid}
             payload = {'id' : int(self.searchArea.text())}
             r = requests.get(url, params=payload,cookies=cookies)

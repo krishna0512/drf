@@ -1,3 +1,4 @@
 *.pyc
+*.swp
 
 mysite/db.sqlite3

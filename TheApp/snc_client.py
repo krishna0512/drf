@@ -10,6 +10,7 @@ import pycurl
 import requests
 import hashlib
 import json
+from header import *
 
 form_class = uic.loadUiType("clientUi.ui")[0]
 
@@ -47,7 +48,7 @@ class PopupQues(QtGui.QDialog):
                 submitedAns.append(True)
             else:
                 submitedAns.append(False)
-        url = 'http://localhost:8000/polls/SubAns/'
+        url = URL + 'SubAns/'
         payload = {'options':submitedAns}
         cookies = {'sessionid':self.sessionid}
         r=requests.get(url,params=payload, cookies=cookies)
@@ -125,7 +126,7 @@ class Player(QtGui.QMainWindow,form_class):
 
         # getting the digest value from the snc_server
         cookies = {'sessionid':self.sessionid}
-        url = 'http://localhost:8000/polls/InitDigest/'
+        url = URL + 'InitDigest/'
         dig = str(requests.get(url,cookies=cookies).text)
         # changing the filename according to the fact weather md5 is provided or not.
 
@@ -286,7 +287,7 @@ class Player(QtGui.QMainWindow,form_class):
         """updates the user interface"""
         # setting the slider to the desired position
         cookies = {'sessionid':self.sessionid}
-        url = 'http://localhost:8000/polls/GetCurSet/'
+        url = URL + 'GetCurSet/'
         r = requests.get(url, cookies=cookies)
         self.data        = json.loads(r.text)
         self.sync        = self.data['synVideo' ]
@@ -378,7 +379,7 @@ class Player(QtGui.QMainWindow,form_class):
             print self.sessionid
             self.timer.stop()
             cookies = {'sessionid':self.sessionid}
-            r=requests.get('http://localhost:8000/polls/Logout/', cookies=cookies)
+            r=requests.get(URL + 'Logout/', cookies=cookies)
             event.accept()
         else:
             event.ignore() 

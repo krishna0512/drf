@@ -10,6 +10,7 @@ from   PyQt4      import QtGui, QtCore, uic
 from   chat         import *
 import snc_server
 import snc_client 
+from header import *
 
 class TaView(QtGui.QWidget):
     '''
@@ -44,12 +45,12 @@ class TaView(QtGui.QWidget):
 
     def updateUI(self):
         if self.snc == None: print "snc_server is None.."
-        url = 'http://localhost:8000/polls/GetAllUsers/'
+        url = URL + 'GetAllUsers/'
         r           =   requests.get(url,cookies=self.cookies)
         users       =   json.loads(r.text)
         students    =   users['student']
         ta          =   users['ta']
-        url = 'http://localhost:8000/polls/GetLoggedinUsers/'
+        url = URL + 'GetLoggedinUsers/'
         r           =   requests.get(url,cookies=self.cookies)
         linUsers    =   json.loads(r.text)
         linStudents =   linUsers['student']
@@ -67,7 +68,7 @@ class TaView(QtGui.QWidget):
         self.header2    = QtGui.QLabel('Students:', self)
 
         # getting the correct and incorrect users for the lastest question.
-        url = 'http://localhost:8000/polls/GetStatusOfQuestion/'
+        url = URL + 'GetStatusOfQuestion/'
         r = requests.get(url)
         t = str(r.text)
         # List of the the users that gave the correct answer to latest question.
@@ -126,7 +127,7 @@ class TaView(QtGui.QWidget):
                 submitedAns.append(True)
             else:
                 submitedAns.append(False)
-        url = 'http://localhost:8000/polls/SubAns/'
+        url = URL + 'SubAns/'
         payload = {'options':submitedAns}
         r=requests.get(url,params=payload,cookies=self.cookies)
         self.hide()
@@ -140,9 +141,9 @@ class TaView(QtGui.QWidget):
             self.payload['synVideo'] = False
             data = json.dumps(self.payload)
             data = {'data':data}
-            url = 'http://localhost:8000/polls/PostCurSet/'
+            url = URL + 'PostCurSet/'
             r=requests.get(url,params = data,cookies=self.cookies)
-            r=requests.get('http://localhost:8000/polls/Logout/', cookies=self.cookies)
+            r=requests.get(URL + 'Logout/', cookies=self.cookies)
             print 'about to exit'
             event.accept()
         else:

@@ -9,6 +9,7 @@ import pycurl
 import json
 import requests
 import hashlib
+from header import *
 
 form_class = uic.loadUiType("serverUi.ui")[0]
 
@@ -89,7 +90,7 @@ class PostQues(QtGui.QWidget):
             self.dlg.show()
             
         else:
-            url = 'http://localhost:8000/polls/PostQues/'
+            url = URL + 'PostQues/'
             payload = {'options':options, 'ques':question, 'currectAnswer':currectAns}
             r=requests.get(url,params=payload)
             self.hide()
@@ -196,7 +197,7 @@ class Player(QtGui.QMainWindow,form_class):
             self.payload['synVideo'] = False
             data = json.dumps(self.payload)
             data = {'data':data}
-            url = 'http://localhost:8000/polls/PostCurSet/'
+            url = URL + 'PostCurSet/'
             cookies = {'sessionid':self.sessionid}
             r = requests.get(url,params = data,cookies = cookies)
             print 'about to exit'
@@ -239,7 +240,7 @@ class Player(QtGui.QMainWindow,form_class):
         data = {}
         data['videoDigest'] = dig
         cookies = {'sessionid':self.sessionid}
-        url = 'http://localhost:8000/polls/InitDigest/'
+        url = URL + 'InitDigest/'
         requests.get(url,params = data, cookies=cookies)
         
         self.media = self.instance.media_new(filename)
@@ -320,7 +321,7 @@ class Player(QtGui.QMainWindow,form_class):
 
     def updateUI(self):
         """updates the user interface"""
-#        url = 'http://localhost:8000/polls/GetCurSet/'
+#        url = URL + 'GetCurSet/'
 #        r = requests.get (url)
 #        d = json.loads(str(r.text))
         # setting the slider to the desired position
@@ -340,7 +341,7 @@ class Player(QtGui.QMainWindow,form_class):
         data = json.dumps(self.payload)
         data = {'data':data}
         cookies = {'sessionid':self.sessionid}
-        url = 'http://localhost:8000/polls/PostCurSet/'
+        url = URL + 'PostCurSet/'
         r = requests.get(url,params = data, cookies=cookies)
         data = json.loads(r.text)
         if data['timed'] == True:

@@ -10,6 +10,7 @@ import requests
 import json
 import snc_server
 import snc_client 
+from header import *
 
 form_class = uic.loadUiType("login.ui")[0]
 form2_class = uic.loadUiType("register.ui")[0]
@@ -38,7 +39,7 @@ class Register(QtGui.QDialog,form2_class):
                     'fname'     : str (fnameValue),
                     'ista'      : str (isTA)
                     }
-            url = 'http://localhost:8000/polls/Register/'
+            url = URL + 'Register/'
             r=requests.get(url,params=payload)
             if int(r.status_code) == 500:
                 self.dlg = Dialog('Username already aquired...')
@@ -83,7 +84,7 @@ class Login(QtGui.QMainWindow,form_class):
                     'username' : str (usernameValue),
                     'pass'     : str (passwordValue)
                     }
-            url = 'http://localhost:8000/polls/Login/'
+            url = URL + 'Login/'
             r = requests.get(url,params=payload)
             if r.text == '':
                 self.dlg = Dialog("username or password incorrect")
@@ -93,7 +94,7 @@ class Login(QtGui.QMainWindow,form_class):
                 self.sessionid = r.cookies['sessionid']
                 # Initialising the request with the session variables
                 cookies = {'sessionid':self.sessionid}
-                requests.get('http://localhost:8000/polls/Initialise/', cookies=cookies)
+                requests.get(URL + 'Initialise/', cookies=cookies)
                 data = json.loads(r.text)
                 isTA = data['isTA']
                 if isTA:
